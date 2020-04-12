@@ -3,22 +3,32 @@
 # Time-stamp: <2012-11-29 13:17:43 t-nissie>
 # Author: Takeshi NISHIMATSU
 ##
+
+# 删除cooling.avg文件
 rm -f cooling.avg
 
+#初始温度为350k
 temperature_start=350
+#目标温度为170k
 temperature_goal=170
+#迭代步长为-5k
 temperature_step=-5
-
+#
 n_thermalize=40000
+#
 n_average=10000
 # expr:可以实现数值运算、数值或字符串比较、字符串匹配、字符串提取、字符串长度计算等功能。本处应该是用做数值运算
 n_coord_freq=`expr $n_thermalize + $n_average`
 
+#做迭代操作，每次更新温度，生成该温度下的相关配置文件，并计算，生成该温度下的结果文件
 i=0
 temperature=$temperature_start
+# perl -e：在命令行中使用 -e 选项：输入语句执行代码，执行成功则为1，跳出循环
 while [ `perl -e "print $temperature >= $temperature_goal || 0"` = "1" ] ; do
     i=`expr $i + 1`
+	#生成文件的名称
     filename=cooling`printf '%.3d' $i`-"$temperature"K
+	#将相关参数写入文件
     cat > $filename <<-EOF
 	#--- Method, Temperature, and mass ---------------
 	method = 'md'
@@ -64,10 +74,13 @@ while [ `perl -e "print $temperature >= $temperature_goal || 0"` = "1" ] ; do
 EOF
     #echo 1 > FILES
     #echo $filename >> FILES
+	#使用上一次计算的结果当做当前计算的初值
     if [ -r "$prev_coord" ]; then
         ln -sf "$prev_coord" $filename.restart
     fi
+	#计算入口：可以选择是feram或feram_mpi
     ../../feram $filename
+	#将当前计算完成的结果赋给上一次计算的结果
     prev_coord=$filename.`printf '%.10d' $n_coord_freq`.coord
     cat $filename.avg >> cooling.avg
     temperature=`perl -e "print $temperature + $temperature_step"`

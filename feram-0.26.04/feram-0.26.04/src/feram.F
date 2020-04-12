@@ -17,6 +17,7 @@ program feram
   integer i, argn, command_argument_count
   character(len=FILE_NAME_LEN) :: fn
   argn = command_argument_count()
+  ! 支持输入多个待计算参数文件,若用户输入后，则会按顺序分别执行
   do i=1,argn
      call get_command_argument(i,fn)
      call feram_common(fn)

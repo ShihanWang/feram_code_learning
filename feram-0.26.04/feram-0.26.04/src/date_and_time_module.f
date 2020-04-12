@@ -2,6 +2,7 @@
 ! Time-stamp: <2014-07-16 06:38:44 takeshi>
 ! Author: Takeshi NISHIMATSU
 !!
+!将时间转为Message
 module date_and_time_module
   implicit none
   private
