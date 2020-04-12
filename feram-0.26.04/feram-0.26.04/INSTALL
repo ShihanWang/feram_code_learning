@@ -1,0 +1,504 @@
+=begin
+= How to compile feram
+This document describes how to compile feram for your computers.
+Version and date of installation is written in parentheses ().
+
+== Requirements
+ * GNU make  http://www.gnu.org/software/make/
+ * FFTW3 library  http://www.fftw.org/ (For Intel and AMD machines.
+   version 3.3 or higher. Configure FFTW3 library with options of
+   --enable-openmp --enable-threads --enable-sse2.
+   --enable-avx and --enable-shared are also useful additional configure options.)
+ * Linear algebra library
+   * ATLAS (Automatically Tuned Linear Algebra Software)
+   * BLAS and LAPACK libraries
+ * Fortran 90 compiler
+   * gfortran coming with GCC-4.8 or higher  http://gcc.gnu.org/
+   * Intel Fortran Compiler (ifort; version 14.0.2 and later)
+     http://software.intel.com/en-us/articles/intel-compilers/
+   * IBM XL Fortran for HITACHI SR16000
+   * Fortran 90 (frtpx) for Fujitsu supercomputers: Kei and FX10
+ * xz (data compression software)  http://tukaani.org/xz/
+Modern Linux distributions (Debian, Ubuntu, RedHat, CentOS, etc.) have their
+packages of these software required to compile feram. Check their versions
+with --version option, e.g. make --version, or install them with package
+managers (apt-get, yum, etc.).
+
+== Useful software
+These software are useful for executing feram and analyzing calculated results.
+ * gnuplot (version 4.6)  http://www.gnuplot.info/
+ * Ruby (version 2.1 or higher)  http://www.ruby-lang.org/
+ * epstopdf.pl http://www.ctan.org/pkg/epstopdf
+   ftp://ctan.tug.org/tex-archive/support/epstopdf/epstopdf.pl
+ * tar (version 1.22 or higher)  http://www.gnu.org/software/tar/
+ * gifsicle http://www.lcdf.org/gifsicle/ (For animation)
+
+== Requirements for developing feram
+ * autoconf (version 2.69 or higher)    http://www.gnu.org/software/autoconf/
+ * automake (version 1.14.1 or higher)  http://www.gnu.org/software/automake/
+ * ULMUL    (version 0.5.3)             https://rubygems.org/gems/ulmul
+
+== Quick compilation
+If you have all the required libraries,
+follow this quick compilation instruction.
+ $ tar xf feram-X.YY.ZZ.tar.xz   # If you do not have the latest tar(1),
+                                 # $ xz -cd feram-X.YY.ZZ.tar.xz | tar xf -
+ $ cd feram-X.YY.ZZ
+ $ mkdir build-gfortran-4.8      # Use a build directory.
+ $ cd $_
+ $ ../configure --help
+ $ ../configure
+ $ cd src
+ $ make -j --max-load=10.0
+ $ ls -l feram*
+ $ make feram_mpi                # OPTIONAL. mpif90 is required.
+ $ OMP_NUM_THREADS=6 make check  # OPTIONAL
+ $ sudo make install             # OPTIONAL. feram and tools are installed into /usr/local/bin/.
+ $ cp -r ../../src/27example-BaTiO3-new-param-E_wave .
+ $ cd 27example-BaTiO3-new-param-E_wave
+ $ ../feram 360cos.feram 360sin.feram
+ $ gnuplot hysteresis.gp  # plot a hysteresis loop
+
+If you installed FFTW3 into your home directory,
+specify CPPFLAGS and LDFLAGS for configure.
+ $ ../configure FC=gfortran CPPFLAGS=-I/home/takeshi/include LDFLAGS=-L/home/takeshi/lib
+
+== Linux
+=== Debian 7.x and 8.x and Ubuntu 14.04 LTS and 16.04 LTS (feram-0.26.02, 2016-10-10)
+FFTW3, ATLAS libraries and GNU Fortran (gfortran) can be easily
+installed into Debian 7.x (Wheezy) GNU/Linux systems or Ubuntu systems
+with apt-get(8) command. See http://www.ubuntu.com or http://www.debian.org .
+==== install required packages
+ $ sudo apt-get install libatlas-base-dev gfortran libfftw3-dev athena-jot
+ $ sudo apt-get --purge remove liblapack-dev liblapack3 liblapack3gf
+==== compile feram
+ $ tar xf feram-0.26.02.tar.xz
+ $ mkdir feram-0.26.02/build-with-gfortran
+ $ cd feram-0.26.02/build-with-gfortran
+ $ ../configure && make -j --max-load=10.0
+ $ make check   # OPTIONAL
+
+=== Fedora 21 (feram-0.22.05, 2014-11-05)
+FFTW3, BLAS and LAPACK libraries and GNU Fortran (gfortran) can be easily
+installed into Fedora systems with yum(8) command. See http://fedoraproject.org .
+==== install required packages
+ # yum install gcc gcc-gfortran
+ # yum install fftw-devel blas-devel lapack-devel gnuplot csh
+ # yum install autoconf.noarch automake.noarch libtool subversion   # For developers
+==== compile feram
+ $ tar xf feram-0.22.05.tar.xz
+ $ mkdir feram-0.22.05/fedora21
+ $ cd feram-0.22.05/fedora21
+ $ ../configure && make -j --max-load=10.0
+ $ make check   # OPTIONAL
+
+=== CentOS 7 (feram-0.26.02, 2016-10-10)
+FFTW3, BLAS and LAPACK libraries and GNU Fortran (gfortran) can be easily
+installed into CentOS 7 systems with yum(8) command.
+==== install required packages
+ # yum install gcc gcc-gfortran fftw-devel blas-devel lapack-devel gnuplot csh
+ # yum install autoconf.noarch automake.noarch libtool subversion   # For developers
+==== compile feram
+ $ wget http://sourceforge.net/projects/loto/files/feram//feram-0.26.02/feram-0.26.02.tar.xz
+ $ tar xf feram-0.26.02.tar.xz
+ $ mkdir  feram-0.26.02/CentOS7
+ $ cd $_
+ $ ../configure
+ $ make -j4
+ $ make check   # OPTIONAL
+
+=== CentOS 6.x (feram-0.24.02)
+CentOS 6.x can be installed to your x86_64 system with DVD or
+CD-ROM images in http://isoredirect.centos.org/centos/6/isos/x86_64/ .
+
+==== check the version of gfortran and GNUPLOT
+Default version of gfortran in CentOS 6.x is 4.4.6.
+However, you need gfortran-4.8 or higher to compile feram.
+Please install the latest GCC.
+ $ gfortran --version
+ GNU Fortran (GCC) 4.8.3 ...
+
+To `make check`, you need version 4.6 or 5.0 of GNUPLOT.
+ $ gnuplot --version
+ gnuplot 4.6 patchlevel 7
+
+==== install fftw-3.3.4.tar.gz
+ $ tar zxf fftw-3.3.4.tar.gz
+ $ cd fftw-3.3.4
+ $ mkdir CentOS6
+ $ cd CentOS6
+ $ ../configure --prefix=/usr/local --libdir=/usr/local/lib64 --enable-openmp --enable-threads --enable-sse2 --enable-avx --enable-shared
+ $ make -j4
+ $ make check
+ $ su
+ # make install
+ # exit
+
+==== install BLAS and LAPACK
+ $ su
+ # yum install blas-devel lapack-devel
+ # exit
+
+==== compile feram
+ $ export LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH
+ $ tar xf feram-0.24.02.tar.xz
+ $ cd feram-0.24.02
+ $ mkdir CentOS6
+ $ cd CentOS6
+ $ ../configure --help
+ $ ../configure
+ $ make -j4
+ $ OMP_NUM_THREADS=6  make check   # OPTIONAL
+ $ OMP_NUM_THREADS=12 make check   # OPTIONAL
+ $ ls -l src/feram
+ $ ldd   src/feram
+
+=== Linux with Intel Fortran Compiler and FFTW library
+It would be better to use Intel Fortran (ifort) version 15.0.2 or higher.
+If you are using version 14.0.2 of Intel Fortran (ifort),
+the FFTW3 libraries should be compiled with icc or
+gcc version 4.6 or lower to avoid missmatch of ABI.
+ $ . /opt/intel/bin/ifortvars.sh intel64     # Put these two lines in your
+ $ . /opt/intel/mkl/bin/mklvars.sh intel64   # ~/.bashrc or somewhere.
+ $ tar xf feram-X.YY.ZZ.tar.xz
+ $ cd feram-X.YY.ZZ
+ $ ifort --version
+ ifort (IFORT) 14.0.2 20140120
+ $ mkdir ifort-14.0.2-FFTW
+ $ cd    ifort-14.0.2-FFTW
+ $ ../configure --help
+ $ strings /home/t-nissie/Linux-x86_64/lib64/libfftw3.a | grep GCC | uniq
+ GCC: (GNU) 4.4.6 20110731 (Red Hat 4.4.6-3)
+ $ ../configure FC=ifort CPPFLAGS=-I/home/t-nissie/Linux-x86_64/include LDFLAGS=-L/home/t-nissie/Linux-x86_64/lib64 --with-fft=fftw3_omp --with-lapack=mkl
+ $ cd src
+ $ make -j --max-load=10.0
+ $ export LD_LIBRARY_PATH=/home/t-nissie/Linux-x86_64/lib64:$LD_LIBRARY_PATH
+ $ ldd feram
+ $ make feram_mpi                 # OPTIONAL. mpif90 is required.
+ $ OMP_NUM_THREADS=6 make check   # OPTIONAL
+
+
+=== Linux with Intel Fortran Compiler and FFTW wrappers in Intel MKL
+Currently, feram-0.23.?? and feram-0.24.?? compiled with this method is VERY SLOW,
+because fftw_plan_many_dft_r2c() and fftw_plan_many_dft_c2r() in
+Intel MKL 11.2 are not optimized.
+ $ . /opt/intel/bin/ifortvars.sh intel64     # Put these two lines in your
+ $ . /opt/intel/mkl/bin/mklvars.sh intel64   # ~/.bashrc or somewhere.
+ $ tar xf feram-X.YY.ZZ.tar.xz
+ $ cd feram-X.YY.ZZ
+ $ ifort --version
+ ifort (IFORT) 14.0.2 20140120
+ $ mkdir ifort-14.0.2-MKL
+ $ cd    ifort-14.0.2-MKL
+ $ ../configure --help
+ $ ../configure FC=ifort CPPFLAGS="-I$MKLROOT/include/fftw" --with-fft=mkl --with-lapack=mkl
+ $ cd src
+ $ cp SOMEWHERE/fftw3.f03 .
+ $ make -j --max-load=10.0
+ $ make feram_mpi                 # OPTIONAL. mpif90 is required.
+ $ OMP_NUM_THREADS=6 make check   # OPTIONAL
+
+== Super computers
+=== HITACHI SR16000 with IBM xlf90_r, FFTW 3.3 and dsyevx in ESSL (libesslsmp)
+IBM XL Fortran (xlf90_r) version 14.01.0000.0012 or higher is required.
+(Without XL Fortran for AIX Fix Pack 12 (August 2015 Update) for 14.1,
+you cannot compile src/coord_module.F correctly.
+See http://www-01.ibm.com/support/docview.wss?uid=swg1IV73551 .)
+ $ tar xf feram-X.YY.ZZ.tar.xz
+ $ cd feram-X.YY.ZZ
+ $ mkdir SR16000-xlf
+ $ cd SR16000-xlf
+ $ xlf90_r -qversion   # Displays the official compiler product name and version information
+ $ ../configure FC=xlf90_r CPPFLAGS=-I/sysap/fftw_xlc_simd/include LDFLAGS=-L/sysap/fftw_xlc_simd/lib --with-lapack=essl
+ $ cd src
+ $ grep -v cppoptions /etc/xlf.cfg.71 > myxlf.cfg   # Enable C-style comments
+ $ mv Makefile Makefile~
+ $ sed 's/DEFS = -DHAVE_CONFIG_H/DEFS = -WF,-DHAVE_CONFIG_H -Fmyxlf.cfg/' Makefile~ > Makefile
+ $ make -j10
+ $ MALLOCMULTIHEAP=true XLSMPOPTS="spins=0:yields=0:parthds=32:stride=2:startproc=0" make check   # OPTIONAL
+ $ make feram_mpi   # OPTIONAL
+
+=== Fujitsu Kei and FX10 with their cross compiler frtpx and mpifrtpx
+ $ tar xf feram-X.YY.ZZ.tar.xz
+ $ cd feram-X.YY.ZZ
+ $ mkdir Kei
+ $ cd Kei
+ $ ../configure FC=frtpx --with-fft=ssl2 --with-lapack=ssl2 --host=Kei   # use --host=FX10 for FX10
+ $ cd src
+ $ make
+ $ make feram_mpi   # OPTIONAL
+
+
+== Windows
+On Windows OS, you can use feram through Cygwin or MinGW.
+
+=== Through Cygwin of gnupack (feram-0.26.02, 2016-10-09)
+We install Cygwin with gnupack http://gnupack.sourceforge.jp/docs/latest/UsersGuide.html .
+Then, we install gfortran, FFTW3 and LAPACK packages with apt-cyg command.
+Then, we compile and execute feram.
+==== Downlaod and install gnupack
+Download the latest self-extracting archive gnupack_devel-13.06-2015.11.08.exe
+from http://sourceforge.jp/projects/gnupack/releases/p10360
+and extract it into C:/ .
+==== Install gfortran, FFTW3 and LAPACK
+You can start a UNIX-like terminal with the startup_cygwin.exe command,
+then install software packages of gfortran, FFTW3 and LAPACK
+with `apt-cyg` command from the terminal.
+ # cd
+ # export LANG=C   # It may be unnecessary. Add it if apt-cyg does not work properly.
+ # apt-cyg update
+ # apt-cyg install gcc-fortran libfftw3-devel libfftw3-omp3 liblapack-devel gnuplot
+ # cp /usr/lib/lapack/cyg*.dll /usr/bin   # Copy DLLs under the PATH.
+ # gfortran --version
+ GNU Fortran (GCC) 4.9.3
+ # cat > aaa.f
+ program aaa
+ write(6,*) 'asdf'
+ end program aaa
+ [Control-D]
+ # gfortran -ffree-form aaa.f
+ # ./a.out
+ asdf
+ #
+If you cannot properly execute `a.out` here,
+please try a pretest package of gnupak, gnupack-pretest_devel-2016.08.14.exe.
+==== Compile feram
+Now, let's compile and execute feram!
+ # cd
+ # mkdir -p f/feram
+ # cd f/feram
+ # wget http://sourceforge.net/projects/loto/files/feram/feram-0.26.02/feram-0.26.02.tar.xz
+ # tar xf feram-0.26.02.tar.xz
+ # cd feram-0.26.02
+ # mkdir Cygwin
+ # cd Cygwin
+ # ../configure
+ # make -j4
+ # objdump.exe -p src/feram.exe | head -n 12
+ 
+ src/feram.exe:     file format pei-i386
+ 
+ Characteristics 0x127
+         relocations stripped
+         executable
+         line numbers stripped
+         large address aware
+         32 bit words
+ 
+ Time/Date               Mon Jan  5 05:19:47 2015
+ Magic                   010b    (PE32)
+ # OMP_NUM_THREADS=4 make check
+
+=== Through MinGW (feram-0.22.06, 2014-12-29)
+We compile feram on Windows 8.1 with MinGW and TDM64-GCC.
+==== Install MinGW
+Check MinGW (Minimalist GNU for Windows) homepage http://www.mingw.org/ .
+Download mingw-get-setup.exe from http://sourceforge.net/projects/mingw/files/Installer/ .
+Execute mingw-get-setup.exe to install MinGW.
+You do not have to install C and Fortran compilers here.
+Select only "mingw-developer-toolkit".
+You can also select msys-mintty, msys-wget, msys-upzip, msys-zip, etc.
+
+Add "C:\MinGW\bin;" to the PATH environment variable by opening the System control panel,
+going to the Advanced tab, and clicking the Environment Variables button.
+
+Making a shortcut of
+ c:\MinGW\msys\1.0\bin\mintty.exe /bin/bash --login -i
+on your desktop may be useful.
+You can do following compilations and installations on this mintty.
+
+To add more packages, you can double-click "MinGW Install", select new packages, then
+apply changes. Or you can add packages with mingw-get:
+ $ mingw-get update
+ $ mingw-get upgrade
+ $ mingw-get install msys-mintty msys-wget msys-zip msys-unzip
+
+==== Install TDM64-GCC
+Because gfortran and OpenMP (mingw32-pthreads-w32) in MinGW cannot
+compile feram code correctly, we install and use TDM64-GCC.
+Go to http://tdm-gcc.tdragon.net/ .
+Download and execute tdm64-gcc-4.9.2-3.exe .
+Mark "fortran" and "openmp" in the TDM-GCC Setup.
+Make sure that "C:\TDM-GCC-64\bin;" is *before* "C:\MinGW\bin;" in the
+PATH environment variable.
+Check the version number of gfortran
+ $ gfortran --version
+ GNU Fortran (tdm64-1) 4.9.2
+     :
+
+==== Install FFTW
+Referring to http://www.fftw.org/install/windows.html ,
+you can compile and install FFTW library as:
+ $ cd
+ $ mkdir -p work/fftw
+ $ cd work/fftw
+ $ wget http://fftw.org/fftw-3.3.4.tar.gz
+ $ tar xf fftw-3.3.4.tar.gz
+ $ cd fftw-3.3.4
+ $ mkdir MinGW
+ $ cd MinGW
+ $ ../configure --enable-threads --with-combined-threads --enable-sse2 --enable-avx --enable-shared --with-our-malloc16 --disable-static --with-windows-f77-mangling
+ $ make   # Do not use the -j option.
+ $ make install
+ $ hash -r
+ $ fftw-wisdom --version   # Check its version.
+Note that installed /usr/local/bin/libfftw3-3.dll does not have the OpenMP library, but the threads library.
+==== Install BLAS and LAPACK
+ $ wget http://www.netlib.org/lapack/lapack-3.5.0.tgz
+ $ tar xf lapack-3.5.0.tgz
+ $ cd lapack-3.5.0
+ $ cp make.inc.example make.inc
+ $ cd BLAS/src
+ $ make   # Do not use the -j option.
+ $ cd ../..
+ $ make   # Tests fail, but we do not care.
+ $ cp liblapack.a /usr/local/lib/
+ $ cp librefblas.a /usr/local/lib/libblas.a
+==== Install feram
+ $ wget http://sourceforge.net/projects/loto/files/feram/feram-0.22.06/feram-0.22.06.tar.xz
+ $ tar xf feram-0.22.06.tar.xz
+ $ cd feram-0.22.06
+ $ mkdir MinGW
+ $ cd MinGW
+ $ ../configure LDFLAGS=-L/usr/local/lib --with-fft=fftw3_combined_threads
+ $ make   # Do not use the -j option.
+ $ objdump.exe -p src/feram.exe
+ 
+ src/feram.exe:     file format pei-x86-64
+ 
+ Characteristics 0x27
+         relocations stripped
+         executable
+         line numbers stripped
+         large address aware
+ 
+ Time/Date               Sun Dec 28 17:45:01 2014
+ Magic                   020b    (PE32+)
+     :
+ $ make check
+==== GNU Autotools
+The latest autoconf and automake are required for developers of feram.
+
+ $ wget http://ring.tains.tohoku.ac.jp/pub/GNU/autoconf/autoconf-2.69.tar.xz
+ $ tar xz autoconf-2.69.tar.xz
+ $ cd autoconf-2.69
+ $ mkdir MinGW
+ $ cd MinGW
+ $ ../configure
+ $ make
+ $ make install
+ $ hash -r
+ $ autoconf --version
+
+ $ wget http://ring.tains.tohoku.ac.jp/pub/GNU/automake/automake-1.14.1.tar.xz
+ $ tar xz automake-1.14.1.tar.xz
+ $ cd automake-1.14.1
+ $ mkdir MinGW
+ $ cd MinGW
+ $ ../configure
+ $ make
+ $ make install
+ $ hash -r
+ $ automake --version
+==== Ruby, GNUPLOT and Ghostscript
+Use good installers for Ruby, GNUPLOT and Ghostscript.
+ * Ruby: http://rubyinstaller.org
+ * GNUPLOT: gp466-win32-setup.exe in https://sourceforge.net/projects/gnuplot/files/
+ * GhostScript: gs915w32.exe from http://www.ghostscript.com
+ * You may have to modify epstopdf.pl for MinGW: http://www.ctan.org/pkg/epstopdf
+
+== Mac OS X
+Before everything, you have to install Xcode from Mac App Store.
+It is free of charge. Its Command Line Tools is also useful.
+(Note that /usr/bin/gcc is Apple LLVM, not GCC.
+And LLVM does not have OpenMP yet.)
+
+Mac OS X has LAPACK and BLAS in /usr/lib/ by default.
+
+Three ways of setting up software-developing
+environments on Mac OS X are described below.
+ * With Mac Ports
+ * With Homebrew
+ * From source
+
+=== With Mac Ports
+The MacPorts Project's official homepage is https://www.macports.org .
+Install MacPorts, then install ports of gfortran and FFTW3.
+ $ sudo port install gcc48
+ $ sudo port select --list gcc
+ Available versions for gcc:
+ llvm-gcc42
+ mp-gcc48
+ none (active)
+ $ sudo port select gcc mp-gcc48
+ Available versions for gcc:
+ llvm-gcc42
+ mp-gcc48 (active)
+ none
+ $ gfortran --version
+ GNU Fortran (GCC) 4.8.x
+ $ port install fftw-3 +gfortran
+ $ wget http://sourceforge.net/projects/loto/files/feram/feram-0.26.02/feram-0.26.02.tar.xz
+ $ tar xf feram-0.26.02.tar.xz
+ $ cd feram-0.26.02
+ $ ./configure LDFLAGS=-L/opt/local/lib --with-fft=fftw3_threads
+ $ make
+ $ make check
+
+=== With Homebrew
+Homebrew http://brew.sh/ is an altanative way to install gfortran etc. into Mac OS X.
+ $ brew install gcc49 --enable-fortran
+Details will be comming soon.
+
+=== From sources (feram-0.26.02, 2016-10-09)
+You can easily compile the latest gfortran in GCC 6.2.0 package
+with Xcode and its Command Line Tools on Mac OS X.
+And then, you can compile FFTW with gcc and feram with gfortran.
+==== Install libraries for GCC
+Basically, these libraries can be installed with configure && make && make install manner.
+ * The GNU Multiple Precision Arithmetic Library
+   * Home page: https://gmplib.org
+   * Use gmp-5.1.3.tar.xz in http://ring.tains.tohoku.ac.jp/pub/GNU/gmp/ or somewhere.
+   * Configure: ./configure
+ * The GNU MPFR Library
+   * Home page: http://www.mpfr.org
+   * Use mpfr-3.1.2.tar.xz in http://ring.tains.tohoku.ac.jp/pub/GNU/mpfr/ or somewhere.
+   * Configure: ./configure --with-gmp=/usr/local
+ * GNU MPC
+   * Home page: http://mpc.multiprecision.org/
+   * Use mpc-1.0.2.tar.gz in http://ring.tains.tohoku.ac.jp/pub/GNU/mpc/ or somewhere.
+   * Configure: ./configure --with-gmp=/usr/local --with-mpfr=/usr/local
+==== Install GCC
+ $ tar xf gcc-6.2.0.tar.bz2
+ $ cd gcc-6.2.0
+ $ ./configure CFLAGS="-O3 -pipe -march=native -msse2" CXXFLAGS="-O3 -pipe -march=native -msse2" \
+   --with-gmp=/usr/local --with-mpfr=/usr/local --with-mpc=/usr/local -enable-languages=c,c++,fortran,objc \
+   CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++
+ $ make -j4
+ $ sudo make install
+==== Install FFTW3
+ $ tar xf fftw-3.3.5.tar.gz
+ $ cd fftw-3.3.5
+ $ mkdir Darwin
+ $ cd Darwin
+ $ ../configure --enable-openmp --enable-threads --enable-sse2 --enable-avx --enable-shared
+ $ emacs tools/Makefile   # Edit LIBFFTWTHREADS to link libfftw3_omp, not libfftw3_threads.
+ $ make -j4
+ $ make check
+ $ sudo make install
+==== Compile feram
+ $ tar xf feram-X.YY.ZZ.tar.xz
+ $ cd feram-X.YY.ZZ
+ $ mkdir Darwin
+ $ cd Darwin
+ $ ../configure --help
+ $ ../configure
+ $ make -j2
+ $ ls -l src/feram
+ $ ldd src/feram
+ $ OMP_NUM_THREADS=4 make check   # OPTIONAL
+=end
+# Local variables:
+#   mode: RD
+#   compile-command: "make INSTALL.html"
+# End:

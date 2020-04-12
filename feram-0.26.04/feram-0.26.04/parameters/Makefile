@@ -1,0 +1,39 @@
+# -*-Makefile-*- for feram/parameters/
+# Time-stamp: <2015-04-22 18:43:50 takeshi>
+# Author: Takeshi NISHIMATSU
+##
+srcdir = .
+
+SOURCEFORGE_FERAM=web.sourceforge.net:/home/groups/l/lo/loto/htdocs/feram
+
+all: parameters.html
+
+%.html: %.txt
+	ruby $< $< > $@
+
+sf: sourceforge
+sourceforge: parameters.html parameters.txt favicon.ico style.css brdmin.patch brdmin-6.2.3-2011-07-01.patch a2f.jpg
+	scp $<                              $(SOURCEFORGE_FERAM)/parameters/index.html
+	scp $^                              $(SOURCEFORGE_FERAM)/parameters/
+	scp BaTiO3-first-principles/*.in    $(SOURCEFORGE_FERAM)/parameters/BaTiO3-first-principles/
+	scp BaTiO3-first-principles/*.rb    $(SOURCEFORGE_FERAM)/parameters/BaTiO3-first-principles/
+	scp BaTiO3-first-principles/*.jpg   $(SOURCEFORGE_FERAM)/parameters/BaTiO3-first-principles/
+	scp BaTiO3-first-principles/*.nqs   $(SOURCEFORGE_FERAM)/parameters/BaTiO3-first-principles/
+	scp BaTiO3-first-principles/*.dat*  $(SOURCEFORGE_FERAM)/parameters/BaTiO3-first-principles/
+	scp BaTiO3-first-principles/*.delta $(SOURCEFORGE_FERAM)/parameters/BaTiO3-first-principles/
+	scp BaTiO3-first-principles/*.files $(SOURCEFORGE_FERAM)/parameters/BaTiO3-first-principles/
+	scp BaTiO3-first-principles/force-constant-matrix/Makefile\
+                                            $(SOURCEFORGE_FERAM)/parameters/BaTiO3-first-principles/force-constant-matrix/
+	scp BaTiO3-first-principles/force-constant-matrix/diagonalized-results.txt\
+                                            $(SOURCEFORGE_FERAM)/parameters/BaTiO3-first-principles/force-constant-matrix/
+	scp BaTiO3-first-principles/force-constant-matrix/*.files\
+                                            $(SOURCEFORGE_FERAM)/parameters/BaTiO3-first-principles/force-constant-matrix/
+	scp BaTiO3-first-principles/force-constant-matrix/*.in\
+                                            $(SOURCEFORGE_FERAM)/parameters/BaTiO3-first-principles/force-constant-matrix/
+
+%.jpg: %.eps
+	gs -q -sDEVICE=ppm -sPAPERSIZE=a4 -r90x90 -dSAFER -dNOPAUSE -dBATCH -sOutputFile=- -q $< | \
+	pnmcrop -white | pnmrotate -90 | cjpeg -quality 90 > $@
+
+clean:
+	rm -rf *.aux *.bbl *.blg *.dvi *.log *.ps *.pdf config.log

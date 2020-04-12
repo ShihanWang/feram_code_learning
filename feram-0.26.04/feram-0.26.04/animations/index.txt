@@ -1,0 +1,41 @@
+=begin
+= Animations created by feram
+
+== Heating-up and cooling-down simulations of ferroelectric capacitors
+Animations of holizontal slices of heating-up and cooling-down
+simulations for BaTiO<sub>3</sub> thin-film capacitors with short-circuited
+electrodes under 1% in-plane biaxial compressive strain.
+The +z-polarized and &minus;z-polarized sites are
+denoted by red open squares and blue filled squares, respectively.
+Used supercell sizes are Lx&times;Ly&times;Lz = 40&times;40&times;2(l+d) .
+ * (a) l=15, d=1
+   * heating-up   http://ftp.aip.org/epaps/phys_rev_b/E-PRBMDO-78-004830/epit-40x40-L015-D1-5.0GPa-heating-animation.gif
+   * cooling-down http://ftp.aip.org/epaps/phys_rev_b/E-PRBMDO-78-004830/epit-40x40-L015-D1-5.0GPa-cooling-animation.gif
+ * (b) l=31, d=1
+   * heating-up   http://ftp.aip.org/epaps/phys_rev_b/E-PRBMDO-78-004830/epit-40x40-L031-D1-5.0GPa-heating-animation.gif
+   * cooling-down http://ftp.aip.org/epaps/phys_rev_b/E-PRBMDO-78-004830/epit-40x40-L031-D1-5.0GPa-cooling-animation.gif
+ * (c) l=127, d=1
+   * heating-up   http://ftp.aip.org/epaps/phys_rev_b/E-PRBMDO-78-004830/epit-40x40-L127-D1-5.0GPa-heating-animation.gif
+   * cooling-down http://ftp.aip.org/epaps/phys_rev_b/E-PRBMDO-78-004830/epit-40x40-L127-D1-5.0GPa-cooling-animation.gif
+ * (d) l=255, d=1
+   * heating-up   http://ftp.aip.org/epaps/phys_rev_b/E-PRBMDO-78-004830/epit-40x40-L255-D1-5.0GPa-heating-animation.gif
+   * cooling-down http://ftp.aip.org/epaps/phys_rev_b/E-PRBMDO-78-004830/epit-40x40-L255-D1-5.0GPa-cooling-animation.gif
+ * (e) l=32, d=0
+   * heating-up   http://ftp.aip.org/epaps/phys_rev_b/E-PRBMDO-78-004830/epit-40x40-L032-D0-5.0GPa-heating-animation.gif
+   * cooling-down http://ftp.aip.org/epaps/phys_rev_b/E-PRBMDO-78-004830/epit-40x40-L032-D0-5.0GPa-cooling-animation.gif
+
+=end
+#
+# for ulmul.rb
+#
+require 'rubygems'
+require 'ulmul'
+u=Ulmul.new(1..0)
+
+u.parse(ARGF)
+puts u.html(["style.css"],[],"Takeshi Nishimatsu")
+
+# Local variables:
+#   mode: RD
+#   compile-command: "ruby index.txt index.txt > index.html"
+# End:

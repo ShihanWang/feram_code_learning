@@ -1,0 +1,264 @@
+ToDo:
+o テスト用のタグを作る。例えば、予想される温度とか。
+
+o output_polarization in README.en and README.ja.
+
+o .defects fileのテストスクリプト。
+
+o コーディング規則を作る。
+  「subroutineの先頭ではif (p%verbose>=2) call msg(UNIT_LOG, __FILE__, __LINE__, 'BEGIN', 'foo().')」とか。
+
+o .coord (or .restart) fileの高精度化とそれ用のテストスクリプト
+
+o src/GPa_check.sh で図を書くだけでなく、値のチェックをする。
+
+o configure.ac: After ifort 17.0.1 is released, ifort -openmp should be
+  replaced by ifort -qopenmp, because ifort 16.0.3 says "-openmp is deprecated."
+  14.0: -openmp, 15.0: -openmp or -qopenmp, 16.0: -openmp or -qopenmp, 17.0: ???
+
+o まずacouF.Fとcoord_module.Fとから "!$omp parallel workshare" を使う？
+  src/omp_workshare_check.fを見よ。ただし、SoAに戻すとしたら障害になる。
+
+o mass_acou<0.0d0 なら acoustic 関連の配列で要らないモノは確保しない。
+  Confirm e%acou_kinetic=0 if mass_acou<0
+
+o dVdac.Fのために-finline-matmul-limit=7を使ってみる。
+  https://gcc.gnu.org/onlinedocs/gfortran/Code-Gen-Options.html
+  GCC 6で入る機能かもしれない。
+
+o .fftファイルを書き出さないようにする。
+
+o CUDA化。cuFFTとcuBLASとを使えるようにする。
+  * PGI CUDA Fortranは使わない。
+  * src/cufft_module.fを通し、できるだけCを使わずにFortran 2003だけで書く。
+  * 将来的にはcoord_module.Fの中の大きな配列をGPUに置いたままにする？
+
+o Discard hysteresis_loop.F. Use n_E_wave_period and E_wave_type.
+o src/hysteresis_loop.F DETAILED_MESSAGES
+
+o src/23example-BaTiO3-new-param-hl-film-acoustic-mass/
+  のバグを直す。0.22.04ではバグの再現さえしなくなり、パラの結果が出る。
+  svn diff -r2271:2272 kinetic_energy_dipo.F でバグの再現はするようになったが、これはあくまでquick hack。
+  dead layerがある場合など、c%n_sum_p と p%n_freedom = 3 * p%N とかの比を考慮すること。  
+  src/mirror_force_mirror.Fで単にc%acouRとc%dVdacRをミラーすればよいわけではない。
+  acoustic displacementは双極子でないので静電的ミラーではない！！！
+
+o (nightly) automation of unit test with "make check"
+
+o (nightly) automation of profiling and timing
+
+o No need to initialize Energy_type ???
+
+o remove redundant procedures:
+  - average_module.F: around u_tmp(:) =  u_tmp(:) + c%dipoR(ix,iy,iz,:)
+  - molecular-dynamics.F: around u(alpha) = SUM(c%dipoR(:,:,:,alpha), MASK=c%sum_p(:,:,:))
+  - Then, report uu() and energies in the .hl file.
+
+o 'md' have to be changed to 'np' Nose-Poincare.
+o Nose-Poincareでもacoustic displacementのMDができるように．
+o Imprement Nose:JPhysSocJpn:70:p75-77:2001
+
+o Copyright
+
+o Examples整理
+
+o In initialize-dipoR.F, c%dipoP() must be multiplied by c%s_Nose after read ???
+
+o feram_distribution3d2ppm マニュアル
+
+o dVddi_... -> dV_du_...
+
+o foo-bar.F -> foo_bar.F
+
+o UNIT_SYSTEM の整理
+
+o mirror_force_mirror.F の最後の力のミラーが必要かどうか。必然的に対称になっているはず。
+
+o read_defects_u.F: we may have to count the number of free dipoles.
+
+o  call dipoFFT(p,c)
+   call  dVddi_dipole_dipole(p,c,e)
+   call     dVddi_unharmonic(p,c,e)
+   call        dVddi_E_field(p,c,e)
+   call optimize_homo_strain(p,c,e)
+   call optimize_inho_strain(p,c,e)
+       は nose-poincare.F, leapfrog.F, initialize_dipoR.F に共通なのでまとめる。
+
+o Makefile.amの依存関係。並列コンパイルmake -jでデバグできる。
+
+o 依存関係の自動生成。gfortranに新しく導入される-Mオプションの活用？ makedepf90？
+
+o Reduce memory size using in-place FFT and
+  rank remapping or array dimension changing (See in-place-FFT.ja.txt)
+  Or use reshape?
+
+o striped structure を initial configuration にできるようにする.
+
+o refactoring nose-poincare.F and energy.F
+
+o average 4倍精度に？
+
+o 精度の選択がconfigureへのオプションでできるようにしたい
+  --with-precision=single
+  --with-precision=double
+
+o Q_nose must be a function of T, N and delta_t. AUTOMATIC determination.
+
+o strain energy の 計算をする部分を分離.
+
+o compare 16x16x16, 32x32x32 
+
+o dipoI(3,3,:,:,:) Upper Triangle だけにする？
+  FFTの計算はUpper Triangle だけやってC.C.をコピーするようにした.
+  配列は3x3のまま.
+  どのくらいメモリを減らせる？
+
+o mass_acoustic, mass_strain なんか関係がある
+
+o 3-dimensional hedgehog plot (`with vec` is not available for splot of GNUPLOT)
+
+o interface文
+
+o initial spin configuration をつくる program をわける？
+
+o mass の 9648.53377163899 を define.h へ
+
+o children, parents, use
+
+o input file parserを作る。どんなparser？
+  input file と param.gp とを共通化？
+  タイトルも引数で指定できるようにしないと面倒臭い。
+
+o Use class of Fortran 2003: class Ferroelectrics has a Param, a Coord and a Energy
+
+Not ToDo:
+- 使うGPUって環境変数で選べるの？
+
+Done:
+x plot_dispersion = .ture. で分散関係が出力されるようにする。
+
+x LARGE_MASS_INV = 1.0d0 / 1000000000.0d0
+
+x 入力ファイルの整備
+
+x .F -> .F90 やらない
+
+x 16(kappa=0.22), 32(kappa=0.08), 64(kappa=0.055) で精度を検証
+  dipole-dipole-long.dat が ??e-31になってるから OK?
+
+x dipole-dipole.gp
+
+
+x coord.F: complex*16, allocatable :: dipoP(:,:,:,:,:)
+  real*8 にする
+
+x make dipole-dipole.F's children
+	short-range.F
+	long-range.F
+  dipole-dipole only と, それに short-range をくわえたものをふたつともだせるようにする.
+
+x normal.f
+  正規分布する乱数発生サブルーチン。参考文献をちゃんと書く。
+
+x param.F
+  初期dipole momentの平均値と標準偏差をを与えることが出来るようにする。
+  分散 variance
+  偏差 deviation  init_u_dev(3)
+  平均 average    init_u_avg(3)
+
+x Lz_periodic -> Lz      change mirror.f
+
+x fft.F、SR11000用 HZFT7M()の代わりにHDFZ7M()とHZFD7M()とを使うようにして、
+  さらに２度目の呼び出しから係数の計算などを省くようにする。要configure.acの変更。
+
+x detailed_messages -> verbose, in configure.ac, README.en and source code
+
+x Quit to use libblaslapack/
+
+x p%mass_dipo の default value を 100 amu に
+
+x p%acoustic_mass_amu の導入
+
+x 交流電場を掛けられるようにして、hysteresis_loop.F と
+  molecular-dynamics.F とを統合。sin, cos, (sawsin, sawcos,) ...
+
+x Use wisdom
+
+x Introduce  method = 'vs'  with src/velocity_scaling.F for MD.
+
+x fft.FのDFZ7M()とHZFD7M()、Nx must be even???　→もうMATRIX/MPPは使わない
+
+x -parallel for ifort -> Everythings are parallelized with OpenMP.
+
+x add seeds to normal_dist(mu,sigma,seed1,seed2). speed up DOUBLE.
+
+x acoustic displacement も MD.
+
+x Temperature from averaging acou_kinetic and dipo_kinetic
+
+x continue_without_restart_file for avoiding huge .coord files
+
+x replace DSYEV().
+
+x たとえMakefile.amに依存関係が適切に書かれていても、
+  XL Fortranが書き出すa.lstが並列コンパイルの邪魔をする。
+  a.lstは何？これはmakeの新オプション--output-sync（-O）で回避できる？
+
+x slicer.rb -> feram_slicer.rb, eigenvalues2j -> feram_eigenvalues2j, etc.
+
+x Remove "#if defined(HAVE_LIBFFTW3)" so that we always use FFTW
+
+x continue = .true. でも、前に続けるべき計算がなかったら、エラーで止まるようにする。
+
+x configure.acでulmul2html5のversionが0.5.3であることをチェック。
+
+x Do not make fft.F module. (Done in feram-0.22.00)
+
+x .feram_checkは`make distcheck`のためなので、
+  zzz16.feram_check -> check16.feram はしない。
+  zzzgap.feram_checkを16x16x16にして、wisdomを使えるようにした。
+  See feram_common.F, around basename().
+
+x Z_star(R) in feram-0.25.00unstable
+
+x Fix "610.1vs.defects:***: EOF: reached." in msg.F.
+  See /home/t-nissie/feram/feram-o.00/directECE-on-0.005TGPa-parallel/BTOnew-050/ .
+  また、欠陥の情報も2lfの計算に引き継がれてるかチェックが必要。引き継がれているはずだけど。
+
+x Replace jot(1) with seq(1). Do not use --separator option for seq. Use -s.
+
+x Replace colrm(1) with cut(1).  `cut -b -14` is equivalent with `colrm 15`.
+  We do not do it, because all the systems may have `colrm` by default.
+  Cygwin may not? http://qiita.com/mdstoy/items/9108b7c44be409d4b74f
+  src/elastocaloric770K_check.csh:32:set t_final=`colrm 8 < elastocaloric770K_check.lf.avg`
+  src/elastocaloric770K_check.sh:21:t_final=`colrm 8 < elastocaloric770K_check.lf.avg`
+
+x Error messages to stderr.
+
+x Use SSE or AVX with the latest assembler and FCFLAGS='-g -Wall -Ofast -msse4.2 -pipe -fopenmp'.
+  E5 v3 で ifort で -march=native コンパイルオプションを使っても速くならなかった。
+
+x FILENAME.avgの出力の見直し polarization -> <u_z> とか
+
+x verbose値の階層化。verbose=1では毎イテレーションにはサブルーチン名が出ない方がよいかもしれない。
+
+x mass_dipole も mass_acou も R-dep できるようにする。
+
+x src/08example-BaTiO3-dispersion/ 以下をTESTSに格上げする。
+x plot_dispersion = .ture., 4x4x4, 8x8x8, 32x32x32で同じになるかチェック
+x grep 186547824173781 *long.dat | wc -l -> 6 とか。
+x print-eigenvalues.F を P%padding_y に対応させて、dipole-dipole.F を簡単化。
+
+x Use msg() in write_Param() of param_module.F.
+
+x Automatical determination of kappa
+  kappa for the Ewald summation must be a function of Lx, Ly and Lz
+  p%kappa = sqrt(M_PI) / p%a0 / (dble(p%N))**(1.0d0/6)
+
+x TESTS for feram_slicer.rb and feram_cross-section-q.sh
+
+x feram_slicer.rb マニュアル
+
+x feram_cross_section マニュアル
+
+x feram_slicer.rb を本体に取り込む．z=1/4のところで常にスライス．

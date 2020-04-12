@@ -1,2 +1,4 @@
 # feram_code_learning
-feram software code learning: http://loto.sourceforge.net/feram/
+feram软件代码学习，注释版
+
+feram software: http://loto.sourceforge.net/feram/

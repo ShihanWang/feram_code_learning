@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>feram: 強誘電体の高速分子動力学シミュレーション</title>
+  <meta name="author" content="Takeshi Nishimatsu" />
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'] ]
+      }
+    });
+  </script>
+  <link rel="stylesheet" href="style.css" type="text/css" />
+  <link rel="icon" href="favicon.ico" />
+</head>
+<body onload="prettyPrint()">
+<div class="slide cover">
+<h1 id="LABEL-1">feram: 強誘電体の高速分子動力学シミュレーション</h1><div class="navi">[<a href="index.en.html">English</a>/<a href="index.ja.html">Japanese</a>]</div> <figure><img src="feram_logo.svg" width=300 alt="feram logo" /></figure>
+<p>
+feramは強誘電体薄膜の高速分子動力学シミュレーターです．
+</p>
+<br />
+<div class="table of contents">
+Table of Contents:
+<ul>
+  <li><a href="#LABEL-2">ホームページ，ダウンロード，コンパイル，論文</a></li>
+  <li><a href="#LABEL-3">参考文献</a></li>
+  <li><a href="#LABEL-4">実行方法</a></li>
+  <li><a href="#LABEL-5">入力ファイル</a>
+    <ul>
+      <li><a href="#LABEL-6">パラメータ入力ファイル（.feram file）</a></li>
+      <li><a href="#LABEL-44">.restart input file</a></li>
+      <li><a href="#LABEL-45">.quadratic input file</a></li>
+      <li><a href="#LABEL-46">.defects input file</a></li>
+      <li><a href="#LABEL-47">.localfield input file</a></li>
+      <li><a href="#LABEL-48">.modulation file</a></li>
+      <li><a href="#LABEL-49">FFTW wisdom file</a></li>
+    </ul></li>
+  <li><a href="#LABEL-50">出力ファイル</a>
+    <ul>
+      <li><a href="#LABEL-51">foo123.log</a></li>
+      <li><a href="#LABEL-52">foo123.avg</a></li>
+      <li><a href="#LABEL-53">foo123.distribution</a></li>
+      <li><a href="#LABEL-54">foo123.distribution3d</a></li>
+      <li><a href="#LABEL-55">foo123.hl</a></li>
+      <li><a href="#LABEL-56">foo123.nnnnnnnnnn.coord</a></li>
+      <li><a href="#LABEL-57">foo123.nnnnnnnnnn.slice.eps</a></li>
+      <li><a href="#LABEL-58">foo123.param.gp</a></li>
+      <li><a href="#LABEL-59">foo123.dipole-dipole-long+short.dat</a></li>
+    </ul></li>
+  <li><a href="#LABEL-60">解析ツール</a>
+    <ul>
+      <li><a href="#LABEL-61">feram_transition_detector.rb と feram_transition_sorter.rb</a></li>
+      <li><a href="#LABEL-62">feram_slicer.rb</a></li>
+      <li><a href="#LABEL-63">feram_cross_section_q.sh</a></li>
+    </ul></li>
+  <li><a href="#LABEL-64">シミュレーションの例</a>
+    <ul>
+      <li><a href="#LABEL-65">降温シミュレーションでの各種エネルギー対MDステップのグラフ</a></li>
+      <li><a href="#LABEL-66">バルクBaTiO3の歪みと誘電率の温度依存性</a></li>
+      <li><a href="#LABEL-67">バルクBaTiO3のヒステリシスループの温度依存性</a></li>
+      <li><a href="#LABEL-68">Hysteresis loops for epitaxially constrained and "free" BaTiO3 film capacitors</a></li>
+    </ul></li>
+  <li><a href="#LABEL-69">メーリングリスト</a></li>
+  <li><a href="#LABEL-70">feramの開発</a>
+    <ul>
+      <li><a href="#LABEL-71">GNU Autotools</a></li>
+      <li><a href="#LABEL-72">最新のソースツリーの入手，コンパイル，実行</a></li>
+      <li><a href="#LABEL-73">README.jaとindex.ja.html</a></li>
+    </ul></li>
+  <li><a href="#LABEL-74">ソフトウエアの再配布について</a>
+    <ul>
+      <li><a href="#LABEL-75">feram</a></li>
+      <li><a href="#LABEL-76">引用した図版</a></li>
+    </ul></li>
+  <li><a href="#LABEL-77">作者</a></li>
+  <li><a href="#LABEL-78">おしらせ</a></li>
+</ul>
+</div>
+
+</div>
+
+
+<div class="slide">
+<h2 id="LABEL-2">ホームページ，ダウンロード，コンパイル，論文</h2>
+<p>
+feramのホームページは <a href="http://loto.sourceforge.net/feram/">http://loto.sourceforge.net/feram/</a> です．
+</p>
+<p>
+最新のtar.xzパッケージ (feram-X.YY.ZZ.tar.xz) を
+<a href="http://sourceforge.net/projects/loto/files/feram/">http://sourceforge.net/projects/loto/files/feram/</a>
+から自由にダウンロードすることができます．
+feramはGNU General Public License (GPL)にもとづいて
+コピー・改変・再配布が可能なフリーソフトウエアです．
+</p>
+<p>
+コンパイルの手順は <a href="INSTALL.html">INSTALL</a> に述べられています．
+</p>
+<p>
+feramを使った強誘電体の研究の論文のリストが<a href="doc/publication.html">doc/publication.html</a>にあります．
+</p>
+</div>
+
+
+<div class="slide">
+<h2 id="LABEL-3">参考文献</h2>
+
+<ul>
+  <li>Takeshi Nishimatsu, Masaya Iwamoto, Yoshiyuki Kawazoe, and Umesh V. Waghmare:
+    "First-principles accurate total-energy surfaces for polar structural distortions
+    of Ba2TiO3, PbTiO3, and SrTiO3: consequences to structural transition temperatures",
+    Phys. Rev. B, vol.82, p.134106 (2010) <a href="http://dx.doi.org/10.1103/PhysRevB.82.134106">doi:10.1103/PhysRevB.82.134106</a>.</li>
+  <li>Takeshi Nishimatsu, Umesh V. Waghmare, Yoshiyuki Kawazoe, and David Vanderbilt:
+    "Fast molecular-dynamics simulation for ferroelectric thin-film capacitors using a
+    first-principles effective Hamiltonian", Phys. Rev. B, vol.78, p.104104 (2008)
+    <a href="http://dx.doi.org/10.1103/PhysRevB.78.104104">doi:10.1103/PhysRevB.78.104104</a>.</li>
+  <li>W. Zhong, D. Vanderbilt, and K. M. Rabe: "First-principles theory of ferroelectric
+    phase transitions for perovskites: The case of BaTiO3", Phys. Rev. B, vol.52,
+    pp.6301-6312 (1995) <a href="http://dx.doi.org/10.1103/PhysRevB.52.6301">doi:10.1103/PhysRevB.52.6301</a>.</li>
+  <li>R. D. King-Smith and David Vanderbilt: "First-principles investigation of
+    ferroelectricity in perovskite compounds", Phys. Rev. B, vol.49,
+    pp.5828-5844 (1994) <a href="http://dx.doi.org/10.1103/PhysRevB.49.5828">doi:10.1103/PhysRevB.49.5828</a>.</li>
+  <li>U.V. Waghmare, E. J. Cockayne, and B. P. Burton: "Ferroelectric Phase Transitions
+    in Nano-scale Chemically Ordered PbSc0.5Nb0.5O3 using a First-principles Model
+    Hamiltonian", Ferroelectrics vol.291, p.187 (2003) <a href="http://dx.doi.org/10.1080/00150190390222682">doi:10.1080/00150190390222682</a>.</li>
+  <li>Jaita Paul, Takeshi Nishimatsu, Yoshiyuki Kawazoe and Umesh V. Waghmare:
+    "Ferroelectric Phase Transitions in Ultra-thin Films of BaTiO3",
+    Phys. Rev. Lett., vol.99, p.077601 (2007) <a href="http://dx.doi.org/10.1103/PhysRevLett.99.077601">doi:10.1103/PhysRevLett.99.077601</a>.</li>
+  <li>Jaita Paul, Takeshi Nishimatsu, Yoshiyuki Kawazoe and Umesh V. Waghmare:
+    "Polarization switching in epitaxial films of BaTiO3: A molecular dynamics study",
+    Appl. Phys. Lett., vol.93, p.242905 (2008) <a href="http://dx.doi.org/10.1063/1.3040326">doi:10.1063/1.3040326</a>.</li>
+</ul>
+</div>
+
+
+<div class="slide">
+<h2 id="LABEL-4">実行方法</h2>
+<p>
+feramはコマンドライン引数で与えられたファイルを読み込みます：
+</p>
+<pre>
+$ OMP_NUM_THREADS=6 SOMEWHERE/feram foo.feram bar.feram baz.feram
+</pre>
+<p>
+feramのMPI版であるferam_mpiをmakeすることもできます．
+feram_mpiは入力ファイルを並列処理します．
+</p>
+<pre>
+$ OMP_NUM_THREADS=16 mpiexec -np 3 SOMEWHERE/feram_mpi foo.feram bar.feram baz.feram
+</pre>
+<p>
+各プロセスのスレッド数を環境変数OMP_NUM_THREADSで指定してください．
+マシンやシステムサイズ (N = L_x L_y L_z) によって最適なOMP_NUM_THREADSの値は異なります．
+最新のIntel XeonのGNU/Linuxマシンで実行するのが効果的です．
+feramはあまり大容量のメモリを必要としませんが，高速な実行には広帯域のメモリアクセスが必要です．
+システムサイズ64x64x64までは1 slotのCPUを占有して実行するのがよいでしょう．
+より大きなシステムサイズではslotを跨いだ並列実行 (NUMA) も効果的です．
+プロセスのCPU属性を制御するためにtaskset(1)やnumactl(8)を適宜活用してください．
+</p>
+</div>
+
+
+<div class="slide">
+<h2 id="LABEL-5">入力ファイル</h2>
+<h3 id="LABEL-6">パラメータ入力ファイル（.feram file）</h3>
+<p>
+feram用のパラメータファイルはコメント行と 'tag = value(s)' というタグ行
+からなるテキストファイルです．パラメータファイルのファイル名を
+foo123 または foo123.feram とした場合，出力ファイルは
+foo123.log, foo123.0000000000.cood, ... などとなります．
+それぞれのパラメータをどう決定するかは <a href="parameters/parameters.html">parameters/parameters.html</a>
+に説明があります．
+</p>
+<h4 id="LABEL-7">コメント行</h4>
+<p>
+'#' で始まる行はコメント行で，無視されます．
+空行も無視されます．
+</p>
+<pre>
+# This is a comment line.
+
+
+# Here are two more
+# comment lines.
+</pre>
+<h5 id="LABEL-8">シバン: "#!/usr/local/bin/feram" または "#!./feram"</h5>
+<p>
+.feram入力ファイルの１行目にシバンを書いておいてスクリプトのように実行することができます．
+</p>
+<h4 id="LABEL-9">タグ行</h4>
+<p>
+タグ行には前後がスペースで挟まれた等号 ' = ' が入っていなくてはいけません．
+次のとおり，その左にタグを右に設定値を置きます：
+</p>
+<pre>
+tag = 1.0
+
+tag = -2.0 -3.0 -4.0
+tag =  5.0  6.0  7.0
+</pre>
+<p>
+以下に現在feramで利用可能なタグの一覧を示します．
+</p>
+<h5 id="LABEL-10">verbose</h5>
+<p>
+.logファイル（詳細は「出力ファイル」の項を参照）に出力するメッセージの量を指定します．
+</p>
+<pre>
+verbose = 0
+</pre>
+<p>
+0のとき，.logファイルは作られません（未実装）．
+</p>
+<pre>
+verbose = 1
+</pre>
+<p>
+1（デフォルト値）のとき，.logファイルには最初と最後のイテレーションのエネルギーの値のみがレポートされます．
+</p>
+<pre>
+verbose = 2
+</pre>
+<p>
+2のとき，.logファイルにはすべてのイテレーション毎にエネルギーの値がレポートされます．.logファイルのサイズは巨大になります．
+</p>
+<pre>
+verbose = 3
+</pre>
+<p>
+3のとき，.logファイルにはcallされたサブルーチンがメッセージとして出力されます．
+</p>
+<pre>
+verbose = 4
+</pre>
+<p>
+4のとき，.logファイルにはさらに詳細なメッセージが出力されます．
+</p>
+<h5 id="LABEL-11">method</h5>
+<p>
+シミュレーションの方法を指定します．
+</p>
+<pre>
+method = 'md'
+</pre>
+<p>
+'md'を指定すると能勢−ポアンカレのサーモスタットを使ったカノニカルアンサンブルでの分子動力学シミュレーションを行います．
+</p>
+<pre>
+method = 'vs'
+</pre>
+<p>
+'vs'を指定すると速度スケーリング法を使ったカノニカルアンサンブルでの分子動力学シミュレーションを行います．
+</p>
+<pre>
+method = 'lf'
+</pre>
+<p>
+'lf'を指定すると蛙飛び (leapfrog) 法を使ったミクロカノニカルアンサンブルでの分子動力学シミュレーションを行います．
+</p>
+<pre>
+method = 'mc'
+</pre>
+<p>
+'mc'を指定するとモンテカルロシミュレーションを行います．まだインプリメントされていません．
+</p>
+<pre>
+method = 'hl'
+</pre>
+<p>
+'hl'の機能はちかぢか削除されます．
+ヒステリシスループ (hysteresis loop) のシミュレーションには
+n_E_wave_periodとE_wave_typeとを使って下さい．
+</p>
+<h5 id="LABEL-12">GPa</h5>
+<p>
+圧力をGPa単位で．過小評価されるTcを負圧をかけることにより補正することがある．
+</p>
+<pre>
+GPa = -5.0
+</pre>
+<p>
+また，３つの値を指定することにより垂直応力をかけることもできる．
+</p>
+<pre>
+GPa = 0.0 0.0 -3.0
+</pre>
+<h5 id="LABEL-13">kelvin</h5>
+<p>
+温度．
+</p>
+<pre>
+kelvin = 100
+</pre>
+<h5 id="LABEL-14">mass_amu</h5>
+<p>
+Rにあるunit cellの双極子の長さu(R)の有効質量．
+単位はatomic mass unit．
+</p>
+<h5 id="LABEL-15">acoustic_mass_amu</h5>
+<p>
+もしacoustic_mass_amuが設定されないと，音響変位，すなわち局所歪みは{u(R)}を元に最適化される．
+acoustic_mass_amuとして音響変位の有効質量が
+</p>
+<pre>
+acoustic_mass_amu = 46.44
+</pre>
+<p>
+と与えられると，音響変位についても分子動力学計算が行われる．
+単位はatomic mass unit．一般的に全５原子の平均質量とする．
+今のところ，method = 'md'では音響変位の分子動力学計算はできません．
+method = 'vs'もしくはmethod = 'lf'で使って下さい．
+</p>
+<h5 id="LABEL-16">Q_Nose</h5>
+<p>
+能勢のQ．MD計算に必要なパラメータで，熱欲と系とのカップリングの強さを表す．
+大きなsupercell，高温には大きな値を，
+小さなsupercell，低温には小さな値を使う．
+</p>
+<pre>
+Q_Nose = 14.4
+</pre>
+<h5 id="LABEL-17">bulk_or_film</h5>
+<p>
+システムの構造を指定します．
+'bulk' は無限に周期的なバルクです．
+'film' は「自由な」薄膜キャパシタです．電極は短絡されています．
+'epit' はエピタキシャル歪み（epi_strainで指定）を伴った薄膜キャパシタです．これも電極は短絡されています．
+</p>
+<pre>
+bulk_or_film = 'epit'
+</pre>
+<h5 id="LABEL-18">L</h5>
+<p>
+System size, L_x, L_y and L_z. They must be equal or larger than 4.
+</p>
+<pre>
+L = 32 32 4
+</pre>
+<h5 id="LABEL-19">padding_y</h5>
+<p>
+計算の高速化のためのy方向のパディングの値．
+最適なパディングの値はシステムやコンパイラに依存します．
+64x64x64 と 96x96x96 のシステムサイズなら
+</p>
+<pre>
+padding_y = 5
+</pre>
+<p>
+128x128x128 なら
+</p>
+<pre>
+padding_y = 1
+</pre>
+<p>
+など，いちどベンチマークを取って最適値を出しておくとよいでしょう．
+padding_yの既定値は3です．
+詳しくは <a href="src/coord_module.F">src/coord_module.F</a> を参照してください．
+</p>
+<h5 id="LABEL-20">gap_id</h5>
+<p>
+0: dead layer はなし．
+1: 片側だけに dead layer がある．
+2: 両側に dead layers がある．
+</p>
+<pre>
+gap_id = 1
+</pre>
+<p>
+dead layer の厚さは常に 1 unit cell．
+</p>
+<h5 id="LABEL-21">gap_dipole_u</h5>
+<p>
+dead layerの分極．単位はu(R)と同じÅ．
+</p>
+<pre>
+gap_dipole_u = 0.0 0.0 0.16
+</pre>
+<h5 id="LABEL-22">a0</h5>
+<p>
+ペロブスカイト強誘電体の立方晶の格子定数をÅで指定します．
+</p>
+<pre>
+a0 = 3.99
+</pre>
+<h5 id="LABEL-23">epi_strain</h5>
+<p>
+エピタキシャル歪み．
+</p>
+<pre>
+epi_strain = -0.01
+</pre>
+<p>
+epi_strainはbulk_or_film = 'epit'のときにだけ有効であることに注意して下さい．
+詳しくは <a href="src/optimize-homo-strain.F">src/optimize-homo-strain.F</a> を見てください．
+</p>
+<h5 id="LABEL-24">dt</h5>
+<p>
+タイムステップの長さをピコ秒で．
+</p>
+<pre>
+dt = 0.002
+</pre>
+<h5 id="LABEL-25">n_thermalize, n_average, n_coord_freq, n_hl_freq</h5>
+<p>
+thermalizeにかけるステップ数，物理量の平均を取るのにかける
+ステップ数，.coordファイルを書き出す頻度，ヒステリシスループの
+計算のときに.hlファイルに書き出す頻度．
+</p>
+<pre>
+n_thermalize = 40000
+n_average    = 10000
+n_coord_freq = 50000
+n_hl_freq    =  5000
+</pre>
+<h5 id="LABEL-26">n_E_wave_period, E_wave_type</h5>
+<p>
+external_E_fieldの振幅を持つ外部電場を時間により振動させるときの周期．
+E_wave_typeに'triangular_sin'か'triangular_cos'を指定します．
+src/27example-BaTiO3-new-param-E_wave/ 以下に例があります．
+'triangular_sin'か'triangular_cos'の場合
+n_E_wave_periodは４で割り切れる正の整数でなくてはなりません．
+'ramping_off'と'ramping_on'も使うことができます．
+先にE_wave_typeに'ramping_off'または'ramping_on'を指定しておけば
+n_E_wave_periodはどんな正の整数でもかまいません．
+</p>
+<figure id="Fig:E_wave">
+  <img src="doc/figures/E_wave.jpg" alt="doc/figures/E_wave.jpg" />
+  <figcaption>
+  Figure 1:   Four options of E_wave_type.
+  </figcaption>
+</figure>
+<h5 id="LABEL-27">n_hysteresis_loop_continue</h5>
+<p>
+ヒステリシスループ (hysteresis loop) のシミュレーションを
+n_hysteresis_loop_continue回目のイテレーションから
+再開することができます．
+</p>
+<pre>
+n_hysteresis_loop_continue = 20000
+</pre>
+<h5 id="LABEL-28">coord_directory</h5>
+<p>
+このタグを
+</p>
+<pre>
+coord_directory = 'coord_files'
+</pre>
+<p>
+と設定すると，feramは.coordファイルをそのディレクトリに書き出します．
+この例では coord_files/foo.0000020000.coord などとなります．
+巨大な.coordファイルをNFSのホームディレクトリでなくローカルの
+ハードディスクに書き出したい場合に便利です．特に指定がなければカレント
+ディレクトリに.coordファイルは書き出されます．
+</p>
+<p>
+このタグを 'never' に設定すれば，.coordファイルをけっして書き出しません．
+</p>
+<pre>
+coord_directory = 'never'
+</pre>
+<h5 id="LABEL-29">distribution_directory</h5>
+<p>
+このタグを
+</p>
+<pre>
+distribution_directory = 'distribution_files'
+</pre>
+<p>
+と設定すると，foo123.distribution と　foo123.distribution3d とは
+distribution_files/ ディレクトリに書き出されます．とくに後者は
+ファイルサイズが約180MBと大きいので，ローカルのハードディスクに
+書き出したい場合があるかもしれません．特に指定がなければカレント
+ディレクトリに２つのファイルは書き出されます．
+</p>
+<p>
+もし .distribution と .distribution3d とが必要なければ
+</p>
+<pre>
+distribution_directory = 'never'
+</pre>
+<p>
+としてください．こうすることで計算時間も大幅に節約できます．
+</p>
+<h5 id="LABEL-30">external_E_field</h5>
+<p>
+外部電場Eを[V/Angstrom]の単位で．
+methodが'md', 'lf', 'mc'のときはこの電場で一定．
+methodが'hl'のヒステリシスの計算ではn_averageステップの間に電場が+Eから-Eまで変化する．
+</p>
+<pre>
+external_E_field = 0.00 0.00 -0.01
+</pre>
+<p>
+また，E_wave_typeを指定すると，Eはn_E_wave_periodの周期で振動する．
+</p>
+<h5 id="LABEL-31">P_kappa2, P_alpha, P_gamma</h5>
+<p>
+4次の多項式の係数．
+</p>
+<pre>
+P_kappa2 =    5.502  [eV/Angstrom^2] # P_4(u) = kappa2*u^2 + alpha*u^4
+P_alpha  =  110.4    [eV/Angstrom^4] #  + gamma*(u_y*u_z+u_z*u_x+u_x*u_y),
+P_gamma  = -163.1    [eV/Angstrom^4] # where u^2 = u_x^2 + u_y^2 + u_z^2
+</pre>
+<h5 id="LABEL-32">P_k1, P_k2, P_k3</h5>
+<p>
+6次の項の係数．
+</p>
+<h5 id="LABEL-33">P_k4</h5>
+<p>
+u^8の係数．
+</p>
+<h5 id="LABEL-34">j</h5>
+<p>
+短距離相互作用の係数．
+</p>
+<pre>
+j = -2.648 3.894 0.898 -0.789 0.562 0.358 0.179    j(i) [eV/Angstrom^2]
+</pre>
+<h5 id="LABEL-35">B11, B12, B44</h5>
+<p>
+弾性定数 B11=C11*a0^3 [eV]．
+</p>
+<pre>
+B11 = 126.
+B12 =  44.9
+B44 =  50.3  [eV]
+</pre>
+<h5 id="LABEL-36">B1xx, B1yy, B4yz</h5>
+<p>
+歪みとuとのカップリング係数．
+</p>
+<pre>
+B1xx = -211.   [eV/Angstrom^2]
+B1yy =  -19.3  [eV/Angstrom^2]
+B4yz =   -7.75 [eV/Angstrom^2]
+</pre>
+<h5 id="LABEL-37">seed</h5>
+<p>
+疑似乱数生成器 (RNG) のための２つの整数の種を指定します．
+Marsaglia-Tsang 64-bit uiniversal RNG が使われています．
+</p>
+<pre>
+seed = 143456789 987654321
+</pre>
+<p>
+デフォルトの値は123456789 987654321です．
+次のようにjot(1)を使って種を生成するのもよいでしょう．
+</p>
+<pre>
+$ jot -r 2 1 2147483648
+639779840
+1297280417
+</pre>
+<p>
+bash(1)の$((RANDOM))機能を使うのもよいでしょう．
+</p>
+<pre>
+$ echo $((RANDOM*65536+RANDOM)) $((RANDOM*65536+RANDOM))
+2146723680 1863789493
+</pre>
+<h5 id="LABEL-38">init_dipo_avg, init_dipo_dev</h5>
+<p>
+dipoleの初期状態の平均値とばらつき具合．
+２つの値が
+</p>
+<pre>
+init_dipo_avg = 0.10 0.00 0.00   [Angstrom]  # Average   of initial dipole displacements
+init_dipo_dev = 0.02 0.02 0.02   [Angstrom]  # Deviation of initial dipole displacements,
+</pre>
+<p>
+のとき，４つの双極子があったら
+</p>
+<pre>
+0.09  0.01  0.02
+0.11 -0.02  0.01
+0.08  0.02 -0.03
+0.12 -0.01  0.00
+</pre>
+<p>
+などとなるだろう．.restartファイルが見つからない場合に限り
+init_dipo_avgタグとinit_dipo_devタグとで指定される初期状態が
+疑似乱数を使って作られます．
+</p>
+<h6 id="LABEL-39">Z_star</h6>
+<p>
+unit cellあたりの有効電荷．単位はe．
+</p>
+<pre>
+Z_star     = 9.956
+</pre>
+<h5 id="LABEL-40">epsilon_inf</h5>
+<p>
+光学誘電率ε_∞．
+</p>
+<pre>
+epsilon_inf   = 5.24
+</pre>
+<h5 id="LABEL-41">kappa</h5>
+<p>
+この値は自動的に最適な値に設定されるので，ユーザが指定する必要はない．デバッグのために用いる．
+src/dipole-dipole-long-range.Fで双極子のエワルト和に使われる任意のκである．
+</p>
+<pre>
+kappa = 0.15
+</pre>
+<h5 id="LABEL-42">plot_dispersion</h5>
+<p>
+もし
+</p>
+<pre>
+plot_dispersion = .true.
+</pre>
+<p>
+が指定されたなら，分散関係のプロットのためのデータファイルが書き出されます．
+デフォルトは.false.です．
+</p>
+<p>
+plot_dispersion = .true.のときは
+L_x, L_y, L_z はすべて同じ偶数でなくてはいけません．
+</p>
+<pre>
+L = 32 32 32
+</pre>
+<p>
+がよいでしょう．
+</p>
+<p>
+例題の src/08example-BaTiO3-dispersion/ を見ていただくか、たとえば，
+次のようにテストスクリプト dispersion_check.sh を実行すると分散関係を描くことができます．
+</p>
+<pre>
+$ tar xf SOMEWHERE/feram-X.YY.ZZ.tar.xz
+$ cd feram-X.YY.ZZ
+$ mkdir builddirectory
+$ cd builddirectory
+$ ../configure &amp;&amp; make -j4
+$ make check TESTS='dispersion_check.sh dispersion_32x32x32.inhomo-K.gp'
+$ less dispersion_32x32x32.feram   # the input file
+$ less dispersion_32x32x32.gp      # the GNUPLOT script
+$ gv src/dispersion_32x32x32.long+short.energy.eps &amp;
+$ gv src/dispersion_32x32x32.long+short.eps &amp;
+$ gv src/dispersion_32x32x32.long+short.interaction.eps &amp;
+$ gv src/dispersion_32x32x32.inhomo-K.eps &amp;
+                  # Previews of plots. You may also use evince(1) instead of gv(1).
+</pre>
+<p>
+[Takeshi Nishimatsu el al.: Phys. Rev. B 82, 134106 (2010),
+<a href="http://dx.doi.org/10.1103/PhysRevB.82.134106">http://dx.doi.org/10.1103/PhysRevB.82.134106</a> ] の中の Fig.3 や
+<a href="parameters/parameters.html">parameters/parameters.html</a> の中の Fig.5 と比較してください．
+</p>
+<h5 id="LABEL-43">continue</h5>
+<p>
+feramが
+</p>
+<pre>
+$ feram foo.feram bar.feram
+</pre>
+<p>
+と実行されて，bar.feramの中で
+</p>
+<pre>
+continue = .true.
+</pre>
+<p>
+が指定されたなら，bar.feramはfoo.feramの結果を初期状態として計算を始めます．
+.restartファイルは使われません．
+デフォルトは.false.です．
+</p>
+<h3 id="LABEL-44">.restart input file</h3>
+<p>
+feramを次のようにパラメータ・ファイル "foo123.feram" を引数として
+</p>
+<pre>
+$ feram foo123.feram
+</pre>
+<p>
+と実行すると，feramは "foo123.restart" ファイルを探して，
+見つかればそれを初期状態として用います．.restartファイルの書式は
+.coordファイルと同じです．.restartファイルが見つからない場合は
+init_dipo_avgタグとinit_dipo_devタグとで指定される初期状態が
+疑似乱数を使って作られます．
+</p>
+<h3 id="LABEL-45">.quadratic input file</h3>
+<p>
+２次の原子間力定数行列 (qudratic inter-atomic force constant (IFC)
+matrices) を.quadraticファイルから読み込ませることができます．
+3x3の行列が(Lx/2+1)*Ly*Lz個ひつようです．.quadraticファイルを使う場合，
+j1-j7 をすべてゼロにして下さい．また，P_kappa2を *elevation*
+のために使って下さい．src/25example-BaTiO3-read-quadratic/ にその
+使用例があります．
+</p>
+<h3 id="LABEL-46">.defects input file</h3>
+<p>
+feramを次のようにパラメータ・ファイル "foo123.feram" を引数として
+</p>
+<pre>
+$ feram foo123.feram
+</pre>
+<p>
+と実行すると，feramは "foo123.defects" ファイルを探して，
+見つかればそこに指定された双極子u(R)を固定します．
+このファイルが見つからない場合，上記のような「格子欠陥」は導入されません．
+</p>
+<p>
+.defects 入力ファイルの書式は
+</p>
+<pre>
+ 0  4  0   0.1  0.1  0.3
+ 4  6 13   0.0  0.0  0.3
+   :
+ix iy iz   u_x  u_z  u_z
+   :
+</pre>
+<p>
+と固定するu(R)の位置とベクトルを順に１行ずつ書きます．
+</p>
+<p>
+src/feram_defects_maker.rb はこの .defects 入力ファイルを作るのに便利です．
+</p>
+<h3 id="LABEL-47">.localfield input file</h3>
+<p>
+feramを次のようにパラメータ・ファイル "foo123.feram" を引数として
+</p>
+<pre>
+$ feram foo123.feram
+</pre>
+<p>
+と実行すると，feramは "foo123.localfield" ファイルを探して，
+見つかればそのファイルの中で指定されたサイトに指定された局所場をかけます．
+.localfieldファイルの書式は
+</p>
+<pre>
+ 4  6 13   0.00 0.00 0.10
+   :
+ix iy iz   Ex   Ey   Ez
+   :
+</pre>
+<p>
+局所場の単位は V/Angstrom です．このファイルが見つからない場合，
+局所場はもちろんどこのサイトでも０になります．
+</p>
+<p>
+各サイトにランダムな局所場をかける場合は付属のferam_random_field_generatorを使って.localfieldファイルを作るとよいでしょう．
+</p>
+<pre>
+$ ./feram_random_field_generator Lx Ly Lz  mu_x mu_y mu_z  sigma_x sigma_y sigma_z  seed1 seed2
+$ ./feram_random_field_generator 32 32 243  0.0 0.0 0.0  0.02 0.02 0.02  123456789 987654321
+</pre>
+<h3 id="LABEL-48">.modulation file</h3>
+<p>
+各サイトの acoustic modulation a(R) を指定します．
+acoustic modulation に依存するエネルギは
+</p>
+<pre>
+E_acoustic_modulation = modulation_constant Sigma_R_alpha eta_alpha(R) a(R)
+</pre>
+<p>
+となります．
+</p>
+<h3 id="LABEL-49">FFTW wisdom file</h3>
+<p>
+必須ではありませんが，FFTW用のwisdomファイルを用意すると，
+より最適なFFTのサブルーチンが選ばれるので，
+全体の計算時間を短縮できることがあります．
+逆に全体の計算時間が長くなってしまうこともあります．
+トライ・アンド・エラーで最適な計算条件を探してください．
+</p>
+<p>
+wisdomファイルはferamと同時にsrc/内にビルドされるferam_fftw_wisdomコマンドで生成できます．
+たとえば，src/18example-benchmark/ ディレクトリ内で
+forward.feram のシステムサイズ Lx*Ly*Lz=32*32*243 の計算をするなら，
+</p>
+<pre>
+$ w   # Before executing feram_fftw_wisdom, confirm that load average is zero and there is no background job.
+$ OMP_NUM_THREADS=6 ../feram_fftw_wisdom 1000 32 32 243 3
+      :
+  It takes a few minutes or a few hours depending on the system size.
+      :
+$ mv wisdom_new wisdom
+$ OMP_NUM_THREADS=6 ../feram forward.feram
+$ grep FFTW_WISDOM forward.log
+  feram_common.F: 47: FFTW_WISDOM: Successfully imported FFTW wisdom in current directory.
+$ grep TIMING_REPORT forward.log
+</pre>
+<p>
+とします．
+</p>
+<p>
+feram_fftw_wisdomに与えるコマンドライン引数は
+</p>
+<pre>
+feram_fftw_wisdom &lt;N_TIMES&gt; &lt;Lx&gt; &lt;Ly&gt; &lt;Lz&gt; &lt;padding_y&gt;
+</pre>
+<p>
+です．
+</p>
+<p>
+FFTW wisdomについての詳細は
+<a href="http://www.fftw.org/doc/Other-Important-Topics.html">http://www.fftw.org/doc/Other-Important-Topics.html</a>
+をご覧下さい．もしMKLの中のFFTW3ラッパーを使っている場合は
+wisdomファイルを準備する必要はありません．
+</p>
+</div>
+
+
+<div class="slide">
+<h2 id="LABEL-50">出力ファイル</h2>
+<p>
+feram が feram foo123.feram と実行されたなら
+出力ファイルは foo123. で始まります．
+すなわち，foo123.avg, foo123.0000050000.coord,
+foo123.param.gp, foo123.dipole-dipole-long.dat などです．
+</p>
+<h3 id="LABEL-51">foo123.log</h3>
+<p>
+feramは.logファイルにエネルギーの値などを書き出します．
+書き出す量はverbose = 1,2,3,4で制御できます．
+</p>
+<p>
+デバッグのために verbose = 2 にして実行し，
+出力された.logファイルの中のエネルギーをプロットしてみるのもよいでしょう．
+例：
+</p>
+<pre>
+$ ./feram zzznp.feram
+$ gnuplot zzznp.gp
+$ ./feram zzzlf.feram
+$ gnuplot zzzlf.gp
+</pre>
+<p>
+計算時間が.logファイルの最後に秒を単位として書き出されます．
+ただし，SR16000とFX10の場合，計算時間が１日（86,400秒）を越えるとカウンタが一度リセットされてしまいます．
+</p>
+<pre>
+      :
+   T =  177.1 [K] END ============================================================================
+  molecular-dynamics.F:158: END: molecular_dynamics().
+feram_common.F:104: DATE_AND_TIME: 2016-06-24T23:16:26.498+0900
+ t_initialization, t_simulation,  t_total, n_threads
+       0.47          39.77          40.24    2     #TIMING_REPORT
+feram_common.F:117: FINISH: love &amp;&amp; peace &amp;&amp; free_software
+</pre>
+<h3 id="LABEL-52">foo123.avg</h3>
+<p>
+n_thermalizeイテレーションの恒温化の後，
+物性値の平均がn_averageイテレーションに渡って計算されます．
+例えば温度を変えた入力ファイルで複数の計算をして，
+それらの.avgファイルをまとめてプロットすれば
+物性値の温度依存性を見ることができます．
+.avgファイルの詳しい内容は <a href="src/average_module.F">src/average_module.F</a> の最後を見て下さい．
+</p>
+<h3 id="LABEL-53">foo123.distribution</h3>
+<p>
+u_x(R), u_y(R), u_z(R)の分布関数
+</p>
+<pre>
+D_x(u) = (1/N) Sum_R delta(u_x(R)-u)
+</pre>
+<p>
+をn_averageイテレーションに渡って平均したものが
+foo123.distributionに書き出されます．
+各行は u D_x(u) D_y(u) D_z(u) です．
+∫D_x(u)du=1になっているはずです．
+詳細は <a href="src/average_module.F">src/average_module.F</a> を見てください．
+</p>
+<h3 id="LABEL-54">foo123.distribution3d</h3>
+<p>
+ベクトル u(R) の分布関数
+</p>
+<pre>
+D(u) = (1/N) Sum_R delta(u(R)-u)
+</pre>
+<p>
+をn_averageイテレーションに渡って平均したものが
+foo123.distribution3dに書き出されます．
+各行は kx ky kz D(u) です．D(u)を全空間で
+積分を取ると１になっている，∫D(u)du=1，はずです．
+詳細は <a href="src/average_module.F">src/average_module.F</a> を見てください．
+</p>
+<h3 id="LABEL-55">foo123.hl</h3>
+<p>
+ヒステリシスループのシミュレーションの method = 'hl' の
+ときには，n_hl_freqイテレーション毎に.hlファイルに物性値が
+書き出されます．.avgファイルは作られません．
+詳細は <a href="src/hysteresis_loop.F">src/hysteresis_loop.F</a> を見て下さい．
+</p>
+<h3 id="LABEL-56">foo123.nnnnnnnnnn.coord</h3>
+<p>
+n_coord_freqイテレーション毎にこのファイルに系のスナップショットが記録されます．
+nnnnnnnnnnがイテレーションです．このファイルは feram_slicer.rb (Ruby script) や
+feram_cross_section_q.sh, feram_cross_section_p.sh, and
+feram_cross_section_dVddi.sh (Bourne Shell scripts) で可視化することができます．
+停電や時間切れなどで計算が止まってしまった場合には，
+このファイルを.restartファイルとして計算を再開することができます．
+この.coordファイルの出力は，.feram入力ファイルで
+</p>
+<pre>
+coord_directory = 'never'
+</pre>
+<p>
+と書くことで抑止することができます．
+</p>
+<h3 id="LABEL-57">foo123.nnnnnnnnnn.slice.eps</h3>
+<p>
+z=Lz/4 での断面図を可視化したものが Encapsulated PostScript file（EPSF,
+.epsファイル）として書き出されます．nnnnnnnnnnがイテレーションで，
+.coordファイルと同様，n_coord_freqイテレーション毎に出力されます．
+この .slice.eps ファイルの出力は .feram 入力ファイルに
+</p>
+<pre>
+slice_directory = 'never'
+</pre>
+<p>
+と書くことで抑止することができます．
+</p>
+<h3 id="LABEL-58">foo123.param.gp</h3>
+<p>
+GNUPLOT用のパラメーターファイルです．
+param.gpにファイル名を変更してからcross_section_q.shなどで使います．
+</p>
+<h3 id="LABEL-59">foo123.dipole-dipole-long+short.dat</h3>
+<p>
+foo123.dipole-dipole-long+short.dat, foo123.dipole-dipole-long.dat and
+foo123.dipole-dipole-short.dat は plot_dispersion = .true. とすると作られます．
+光学フォノンの分散関係が入ります．foo123.inhomo-K.dat には音響フォノンの分散関係が入ります．
+</p>
+<p>
+foo123.dipole-dipole-long+short.datの中の１行は
+</p>
+<pre>
+   0.59375  16   3   0 -0.2022348055959993E+001  0.1270295721445465E+001  0.3455139983790274E+002
+</pre>
+<p>
+のようになっていますが，これは
+</p>
+<pre>
+   横軸  k点のインデックス IFC行列の３つの固有値
+</pre>
+<p>
+です．
+</p>
+<p>
+詳細は上のplot_dispersionの説明かソースコード
+<a href="src/dipole-dipole.F">src/dipole-dipole.F</a> と
+<a href="src/print-eigenvalues.F">src/print-eigenvalues.F</a> と
+を参照してください．
+</p>
+</div>
+
+
+<div class="slide">
+<h2 id="LABEL-60">解析ツール</h2>
+<p>
+解析やプロットのためのツールをsrc/ディレクトリ内に用意しました．
+それらは `feram_` で始まります．
+`make install`すると，デフォルトでは/usr/local/bin/に
+feramコマンドとともにインストールされます．
+ほとんどはRubyスクリプトまたはシェルスクリプトですが，
+いくつかはFortranで書かれていてferamと同時にコンパイルされます．
+基本的に使用方法はそのソースコードの先頭に書かれています．
+</p>
+<h3 id="LABEL-61">feram_transition_detector.rb と feram_transition_sorter.rb</h3>
+<p>
+`feram_transition_detector.rb` は降温／昇温シミュレーションの出力の
+cooling.avg または heating.avg ファイルを読み込み，
+&lt;u&gt;の大きな変化がある行に`Tc`のマーカーを印刷します．
+`feram_transition_sorter.rb`はさらにそれを読み取ってソートして，１行に整形します．
+詳細は src/34example-BST/README.md に書かれています．
+</p>
+<h3 id="LABEL-62">feram_slicer.rb</h3>
+<p>
+.coordファイルを読み込んで、スーパーセルの断面図を+z分極を赤の四角枠-z分極を青の正方形で可視化するRubyスクリプトです。
+Encapsulated PostScript file（EPSF, .epsファイル）を直接書き出します。
+第２引数に断面図を描くzの値を指定することもできます。
+</p>
+<pre>
+feram_slicer.rb zzz16.0000000060.coord
+feram_slicer.rb zzz16.0000000060.coord 8   # ---&gt; zzz16.0000000060-slice-z008.eps
+</pre>
+<h3 id="LABEL-63">feram_cross_section_q.sh</h3>
+<p>
+.coordファイルを読み込んで、指定の断面のセルの分極を矢印としてその断面に射影して描画します。
+param.gpをシンボリックリンクなどとして用意してください。
+zzz16.0000000060.coordを指定するとzzz16.0000000060-q-x.epsなどというEPSファイルができます。
+</p>
+<pre>
+Example1:
+   ln -s zzz16.param.gp param.gp
+   feram_cross_section_q.sh zzz16.0000000060.coord   # You will get zzz16.0000000060-q-x.eps.
+Example2:
+   feram_cross_section_q.sh 150K.0000050000.coord 4.0 10 y 0.9
+Usage: ./feram_cross_section_q.sh coord-file [FACTOR] [CONST_Alpha] [Alpha] [ratio] [max_z]
+Arguments:
+ [FACTOR]      u*[FACTOR] will be the length of each arrow.
+ [CONST_Alpha] Visulaize cross sections of alpha=[CONST_Alpha]. Default value: 8.
+ [Alpha]       Alpha=x,y,z. Default value: x.
+ [ratio]       Optional argument to keep the shape of unitcell square exactly.
+               You may want to use this argument when Lx=Ly!=Lz. Default value: 0.7231.
+ [max_z]       It is useful for vertical cross section of a thin-film.
+</pre>
+</div>
+
+
+<div class="slide">
+<h2 id="LABEL-64">シミュレーションの例</h2>
+<p>
+ソフトウエアパッケージの次のディレクトリに入力ファイル（と結果）が入っています．
+</p>
+<pre>
+feram-X.YY.ZZ/src/03example-BaTiO3-bulk-phase-transition/
+feram-X.YY.ZZ/src/09example-BaTiO3-bulk-leap-frog/
+feram-X.YY.ZZ/src/17example-PbTiO3-100-900K/
+feram-X.YY.ZZ/src/20example-BaTiO3-new-param-pyro/
+feram-X.YY.ZZ/src/21example-KNbO3/
+feram-X.YY.ZZ/src/22example-BaTiO3-new-param-hl/
+feram-X.YY.ZZ/src/23example-BaTiO3-new-param-hl-film-acoustic-mass/
+feram-X.YY.ZZ/src/24example-BaTiO3-new-param-heating-cooling/
+feram-X.YY.ZZ/src/25example-BaTiO3-read-quadratic/
+feram-X.YY.ZZ/src/26example-BaTiO3-acoustic-MD/
+feram-X.YY.ZZ/src/27example-BaTiO3-new-param-E_wave/
+feram-X.YY.ZZ/src/28example-PbTiO3-elastocaloric-770K/
+feram-X.YY.ZZ/src/29example-BaTiO3-new-param-defects/
+feram-X.YY.ZZ/src/30example-BaTiO3-new-param-ramping-off/
+feram-X.YY.ZZ/src/31example-BaTiO3-new-param-thermal-conductivity/
+feram-X.YY.ZZ/src/32example-BaTiO3-old-64x64x1024-benchmark/
+feram-X.YY.ZZ/src/34example-BST/
+</pre>
+<h3 id="LABEL-65">降温シミュレーションでの各種エネルギー対MDステップのグラフ</h3>
+<figure id="Fig:MD">
+  <img src="doc/figures/plot.epit-16x16-15-01-5.0GPa-0.01-cooling.jpg" alt="doc/figures/plot.epit-16x16-15-01-5.0GPa-0.01-cooling.jpg" />
+  <figcaption>
+  Figure 2:   50,000 MDMDステップ毎に段階的に降温するシミュレーション．
+  各種エネルギー対MDステップ．
+  </figcaption>
+</figure>
+<h3 id="LABEL-66">バルクBaTiO3の歪みと誘電率の温度依存性</h3>
+<figure id="Fig:strain">
+  <img src="doc/figures/strain-susceptibility.jpg" alt="doc/figures/strain-susceptibility.jpg" />
+  <figcaption>
+  Figure 3:   バルクBaTiO3の歪みと誘電率の温度依存性．３回の相転移が見える．
+  誘電率は双極子の揺らぎ (fluctuation) から計算している．
+  ディレクトリ feram-X.YY.ZZ/src/03example-BaTiO3-bulk-phase-transition/ を見よ．
+  </figcaption>
+</figure>
+<h3 id="LABEL-67">バルクBaTiO3のヒステリシスループの温度依存性</h3>
+<figure id="Fig:epit">
+  <img src="doc/figures/bulk-two-box.jpg" alt="doc/figures/bulk-two-box.jpg" />
+  <figcaption>
+  Figure 4:   バルクBaTiO3のヒステリシスループの温度依存性．
+  常誘電→強誘電の相転移がわかる．
+  </figcaption>
+</figure>
+<h3 id="LABEL-68">Hysteresis loops for epitaxially constrained and "free" BaTiO3 film capacitors</h3>
+<figure id="Fig:epit-vs-free">
+  <img src="doc/figures/epit-vs-free-hysteresis-box.jpg" alt="doc/figures/epit-vs-free-hysteresis-box.jpg" />
+  <figcaption>
+  Figure 5:   Calculated hysteresis loops for capacitors with (a) epitaxially constrained films, and
+  (b) "free" films of various thickness l and with dead layer d at 100 K.
+  </figcaption>
+</figure>
+</div>
+
+
+<div class="slide">
+<h2 id="LABEL-69">メーリングリスト</h2>
+
+<ul>
+  <li>説明: loto, feram, compasses についてのディスカッションとアナウンス</li>
+  <li>購読: <a href="https://lists.sourceforge.net/lists/listinfo/loto-feram-compasses-ml">https://lists.sourceforge.net/lists/listinfo/loto-feram-compasses-ml</a></li>
+  <li>アドレス: loto-feram-compasses-ml{at}lists.sourceforge.net</li>
+  <li>公開: あなたが投稿したメーリングリスト記事はネット上に公開されます</li>
+  <li>言語: 英語</li>
+  <li>管理者: 西松毅</li>
+</ul>
+</div>
+
+
+<div class="slide">
+<h2 id="LABEL-70">feramの開発</h2>
+<h3 id="LABEL-71">GNU Autotools</h3>
+<p>
+feramの開発には GNU Autotools (autoconf and automake) が必要です．
+たいていのLinuxディストリビューションにはこれらのツールのパッケージがあります．
+たとえばDebianやUbuntuなら
+</p>
+<pre>
+$ sudo apt-get install autoconf automake libtool autoconf-doc libtool-doc
+</pre>
+<p>
+でインストールできます．Autotoolsの詳しい解説が<a href="Autotools-memo.ja.html">Autotools-memo.ja</a>にあります．
+</p>
+<h3 id="LABEL-72">最新のソースツリーの入手，コンパイル，実行</h3>
+<p>
+Subversion，すなわちsvn(1)を使って最新のソースツリーを入手します．
+--username=YourUsernameオプションを使わなければ匿名でcheckoutできます．
+</p>
+<pre>
+$ svn checkout --username=YourUsername https://svn.code.sf.net/p/loto/code/feram/trunk feram-trunk
+$ cd feram-trunk
+$ ls -l
+$ autoreconf -v
+$ automake --add-missing
+$ autoreconf -v
+$ ls -l
+$ ./configure --help
+$ ./configure
+$ emacs src/feram.F   # Edit any source code here.
+$ make
+$ make check
+</pre>
+<p>
+便利なsvn(1)のコマンド:
+</p>
+<pre>
+$ svn --help
+$ svn update
+$ svn stat
+$ svn diff
+$ svn log
+</pre>
+<p>
+feramの実行方法:
+</p>
+<pre>
+$ ./feram foo1.feram foo2.feram foo3.feram &amp;
+$ mpiexec -np 3 ./feram_mpi foo1.feram foo2.feram foo3.feram &amp;
+</pre>
+<h3 id="LABEL-73">README.jaとindex.ja.html</h3>
+<p>
+index.ja.htmlはREADME.jaからULMUL <a href="http://t-nissie.users.sourceforge.net/ULMUL/">http://t-nissie.users.sourceforge.net/ULMUL/</a>
+によって自動的に生成しています．README.ja（日本語）やREADME.en（英語）を編集したら
+</p>
+<pre>
+$ make index.en.html index.ja.html
+</pre>
+<p>
+としてうまく変換できることを確認して下さい．
+</p>
+</div>
+
+
+<div class="slide">
+<h2 id="LABEL-74">ソフトウエアの再配布について</h2>
+<h3 id="LABEL-75">feram</h3>
+<p>
+Copyright © 2007-2016 by Takeshi Nishimatsu
+</p>
+<p>
+feram is distributed in the hope that
+it will be useful, but WITHOUT ANY WARRANTY.
+You can copy, modify and redistribute feram,
+but only under the conditions described in
+the GNU General Public License (the "GPL").
+For more detail, see <a href="COPYING">COPYING</a>.
+</p>
+<p>
+ご寄附を頂けると，質問への回答が早く得られる場合があります:
+<a href="http://www.rpip.tohoku.ac.jp/main/kihukin.html">http://www.rpip.tohoku.ac.jp/main/kihukin.html</a>
+</p>
+<p>
+feramを使って成果が得られた場合には，feramというこのプログラムの
+名前と <a href="http://loto.sourceforge.net/feram/">http://loto.sourceforge.net/feram/</a> のURL，
+そして次の２つのわれわれの論文を引用していただけたら幸いです．
+</p>
+<pre>
+[Takeshi Nishimatsu, Umesh V. Waghmare, Yoshiyuki Kawazoe, and David Vanderbilt: Phys. Rev. B 78 (2008) 104104]
+[Jaita Paul, Takeshi Nishimatsu, Yoshiyuki Kawazoe, and Umesh V. Waghmare: Phys. Rev. Lett. 99 (2007) 077601]
+</pre>
+<h3 id="LABEL-76">引用した図版</h3>
+<p>
+feramのドキュメントで引用した下記の図版についてはその作者または出版社が著作権を持っています
+</p>
+
+<ul>
+  <li><a href="doc/figures/BaTiO3-abc-T-dependence.eps">doc/figures/BaTiO3-abc-T-dependence.eps</a> and <a href="doc/figures/BaTiO3-abc-T-dependence.jpg">doc/figures/BaTiO3-abc-T-dependence.jpg</a>
+    are cited from [H. E. Kay and P. Vousden: Philos. Mag. 40, 1019  (1949)].</li>
+  <li><a href="doc/figures/Fong.jpg">doc/figures/Fong.jpg</a> and <a href="doc/figures/FongScience.eps">doc/figures/FongScience.eps</a> are cited from
+    [Dillon D. Fong et al.: Science 304, 1650 (2004)].</li>
+  <li><a href="doc/figures/J.F.Scott.Fig.1.1.a.eps">doc/figures/J.F.Scott.Fig.1.1.a.eps</a>,  <a href="doc/figures/J.F.Scott.Fig.1.1.ae.eps">doc/figures/J.F.Scott.Fig.1.1.ae.eps</a>
+    <a href="doc/figures/J.F.Scott.Fig.1.1.ae.jpg">doc/figures/J.F.Scott.Fig.1.1.ae.jpg</a>, <a href="doc/figures/J.F.Scott.Fig.1.1.e.eps">doc/figures/J.F.Scott.Fig.1.1.e.eps</a> are
+    cited from [J. F. Scott: Ferroelectric Memories (Springer-Verlag,
+    Berlin Heidelberg, 2000)].</li>
+  <li><a href="doc/figures/MC-vs-MD.eps">doc/figures/MC-vs-MD.eps</a>, <a href="doc/figures/MC-vs-MD.jpg">doc/figures/MC-vs-MD.jpg</a>, doc/figures/MC-vs-MD.obj, and
+    <a href="doc/figures/PRBv52p6301-FIG3.jpg">doc/figures/PRBv52p6301-FIG3.jpg</a> are cited from [W. Zhong, D. Vanderbilt, and
+    K. M. Rabe: Phys. Rev. B 52, 6301 (1995)].</li>
+  <li><a href="doc/figures/PbTiO3ShiraneHoshinoSuzuki.eps">doc/figures/PbTiO3ShiraneHoshinoSuzuki.eps</a> and <a href="doc/figures/PbTiO3ShiraneHoshinoSuzuki.jpg">doc/figures/PbTiO3ShiraneHoshinoSuzuki.jpg</a>
+    are cited from [Gen Shirane, Sadao Hoshino, and Kazuo Suzuki: Phys. Rev. 80, 1105 (1950)]</li>
+  <li><a href="doc/figures/RandallBhallaFig3.jpg">doc/figures/RandallBhallaFig3.jpg</a> and <a href="doc/figures/RandallBhallaFig8.jpg">doc/figures/RandallBhallaFig8.jpg</a>  are
+    cited from [C. A. Randall and A. S. Bhalla: Jpn. J. Appl. Phys. 29, 327 (1990)].</li>
+  <li><a href="doc/figures/SilviaFig1.jpg">doc/figures/SilviaFig1.jpg</a> is cited from [Silvia Tinte, B. P. Burton,
+    Eric Cockayne and U. V. Waghmare: Phys. Rev. Lett. 97, 137601 (2006)].</li>
+  <li><a href="doc/figures/TsurumiFig3.eps">doc/figures/TsurumiFig3.eps</a> and <a href="doc/figures/TsurumiFig3.jpg">doc/figures/TsurumiFig3.jpg</a> are cited from
+    [Takaaki Tsurumi, Kouji Soejima, Toshio Kamiya. and Masaki Daimon:
+    Jpn. J. Appl. Phys. 33, 1959 (1994)].</li>
+</ul>
+</div>
+
+
+<div class="slide">
+<h2 id="LABEL-77">作者</h2>
+<p>
+西松 毅 (t_nissie{at}yahoo.co.jp)
+</p>
+</div>
+
+
+<div class="slide">
+<h2 id="LABEL-78">おしらせ</h2>
+<p>
+ご支援に感謝します：
+</p>
+
+<ul>
+  <li>Jawaharlal Nehru Centre for Advanced Scientific Research (JNCASR)  <a href="http://www.jncasr.ac.in/">http://www.jncasr.ac.in/</a></li>
+  <li>Department of Physics and Astronomy, Rutgers University  <a href="http://www.physics.rutgers.edu/">http://www.physics.rutgers.edu/</a></li>
+  <li>Theoretical Physics, Universität Duisburg-Essen  <a href="https://www.uni-due.de/thp/">https://www.uni-due.de/thp/</a></li>
+  <li>文部科学省  <a href="http://www.mext.go.jp/">http://www.mext.go.jp/</a></li>
+  <li>日本学術振興会  <a href="http://www.jsps.go.jp/">http://www.jsps.go.jp/</a></li>
+  <li>科研費（課題番号 23740230, 25400314）</li>
+  <li>東北大学  <a href="http://www.tohoku.ac.jp/">http://www.tohoku.ac.jp/</a></li>
+  <li>金属材料研究所  <a href="http://www.imr.tohoku.ac.jp/">http://www.imr.tohoku.ac.jp/</a></li>
+</ul>
+<p>
+<a href="http://loto.sourceforge.net/feram/">http://loto.sourceforge.net/feram/</a> is hosted by <a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=204591&amp;type=4" width="125" height="37" alt="SourceForge.net Logo" /></a> .
+</p>
+</div>
+<hr />
+<address>Copyright &#169; 2017 Takeshi Nishimatsu</address>
+</body>
+</html>

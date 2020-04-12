@@ -1,0 +1,110 @@
+= README for examples of velocity-scaling (vs) and leapfrog (lf) methods
+See [Takeshi Nishimatsu, Jordan A. Barr and Soctt P. Beckman: "Direct molecular
+dynamics simulation of electrocaloric effect in BaTiO3", J. Phys. Soc. Jpn. 82, 114605 (2013)].
+
+1. acoustic-MD.vs.feram: constant-temperature (T=520 K) MD in the
+   canonical ensemble with the velocity-scaling (vs) method under 160 kV/cm.
+2. Use the vs final state as the lf initial state:
+   ln -sf acoustic-MD.vs.0000050000.coord acoustic-MD.lf.restart
+3. acoustic-MD.lf.feram: constant-energy MD in the microcanonical ensemble
+   with the leapfrog (lf) method under 60 kV/cm.
+
+You will see the change in temperature from 520 K to 504 K in acoustic-MD.avg.
+True refrigeration may be (504-520)*2/5 = -6.4 K, because "acoustic_mass_amu = 46.44"
+is set in both two .feram files and acoustic displacements is treated with MD.
+
+Removing the "acoustic_mass_amu = 46.44" line turns off MD in acoustic
+displacements. The acoustic displacements will be *optimized*.
+
+== Timing
+Timing results.
+
+SR16000 1 node:
+ $ pwd; grep TIMING */*log
+ /home/t-nissie/feram/feram-l.04/26example-BaTiO3-acoustic-1node
+ 26example-0.21.03/acoustic-MD.lf.log:             14.95        2542.03        2556.98     #TIMING_REPORT
+ 26example-0.21.03/acoustic-MD.vs.log:             14.87        2577.11        2591.98     #TIMING_REPORT
+ 26example-0.21.04/acoustic-MD.lf.log:             15.01        2330.87        2345.88     #TIMING_REPORT
+ 26example-0.21.04/acoustic-MD.vs.log:             14.80        2338.31        2353.11     #TIMING_REPORT
+ 26example-0.21.04-optimize/acoustic-MD.lf.log:    15.01        1744.85        1759.86     #TIMING_REPORT
+ 26example-0.21.04-optimize/acoustic-MD.vs.log:    15.15        1712.26        1727.41     #TIMING_REPORT
+ ~/feram/feram-m.04/26example-BaTiO3-acou..lf.log: 15.44        2732.51        2747.95  32 #TIMING_REPORT
+ ~/feram/feram-m.04/26example-BaTiO3-acou..vs.log: 15.45        2770.30        2785.75  32 #TIMING_REPORT
+
+SR16000 1 slot (1/4 node):
+ $ pwd; grep TIMING */*log
+ /home/t-nissie/feram/feram-l.04/26example-BaTiO3-acoustic-1slot
+ 26example-0.21.03/acoustic-MD.lf.log:             10.86        6460.40        6471.26     #TIMING_REPORT
+ 26example-0.21.03/acoustic-MD.vs.log:             10.68        6217.77        6228.45     #TIMING_REPORT
+ 26example-0.21.04/acoustic-MD.lf.log:             10.06        4122.38        4132.44     #TIMING_REPORT
+ 26example-0.21.04/acoustic-MD.vs.log:             10.12        4057.08        4067.20     #TIMING_REPORT
+ 26example-0.21.04-optimize/acoustic-MD.lf.log:    10.09        3235.80        3245.89     #TIMING_REPORT
+ 26example-0.21.04-optimize/acoustic-MD.vs.log:    10.15        3148.79        3158.94     #TIMING_REPORT
+ ~/feram/feram-m.04/26example-BaTiO3-acou..lf.log: 10.14        4075.65        4085.79   8 #TIMING_REPORT
+ ~/feram/feram-m.04/26example-BaTiO3-acou..vs.log: 10.17        4016.88        4027.05   8 #TIMING_REPORT
+
+Xeon E5-2680   1 node (2 chips):
+ $ pwd; grep TIMING 26example-BaTiO3-acoustic-MD*/*log
+ /home/t-nissie/f/loto/feram/trunk/0.22.00-r2040-2014-01-04-platinum-gfortran/src
+ 26example-BaTiO3-acoustic-MD/acoustic-MD.lf.log: 156.55       56279.57       56436.12   16     #TIMING_REPORT
+ 26example-BaTiO3-acoustic-MD/acoustic-MD.vs.log:   9.48        8593.76        8603.24   16     #TIMING_REPORT
+
+Xeon E5-2680 1/2 node (1 chip, got same results with gfortran 4.4.6 and 4.8.2):
+ 26example-BaTiO3-acoustic-MD-1chip-emerald01/acoustic-MD.lf.log, acoustic-MD.vs.log:
+                                                    9.21        4132.82        4142.03    8     #TIMING_REPORT
+                                                    9.20        4222.44        4231.64    8     #TIMING_REPORT
+
+Xeon E5-2680   1 node (2 chips, gfortran-4.8.2, v0.22.04):
+$ pwd; grep TIMING *log
+/home/t-nissie/feram/feram-m.04/26example-BaTiO3-acoustic-MD-gfortran-4.8.2-E5-2680-16thread-emerald02
+acoustic-MD.lf.log:                                10.38        3879.90        3890.28   16     #TIMING_REPORT
+acoustic-MD.vs.log:                                10.54        4014.36        4024.90   16     #TIMING_REPORT
+
+Xeon E5-2680 1/2 node (1 chip,  gfortran-4.8.2, v0.22.04):
+$ pwd; grep TIMING *log
+/home/t-nissie/feram/feram-m.04/26example-BaTiO3-acoustic-MD-gfortran-4.8.2-E5-2680-08thread-emerald01
+acoustic-MD.lf.log:                                10.12        4156.66        4166.78    8     #TIMING_REPORT
+acoustic-MD.vs.log:                                10.14        4231.98        4242.12    8     #TIMING_REPORT
+
+Xeon X5650 (1 or 2 chip, ifort-14.0.2, v0.22.04):
+app26$ pwd; grep TIMING *ifort*/*log
+/home/t-nissie/feram/feram-m.04
+26example-..-06threads/acoustic-MD.lf.log:         22.77        9568.11        9590.88    6     #TIMING_REPORT
+26example-..-06threads/acoustic-MD.vs.log:         22.80        9730.87        9753.67    6     #TIMING_REPORT
+26example-..-12threads/acoustic-MD.lf.log:         22.82        5288.60        5311.42   12     #TIMING_REPORT
+26example-..-12threads/acoustic-MD.vs.log:         22.91        5378.48        5401.39   12     #TIMING_REPORT
+
+Xeon X5650 (1 or 2 chip, gfortran 4.9.1, v0.22.04):
+app13$ pwd; grep TIMING 26example-BaTiO3-acoustic-MD-gfortran-4.9.1-X5650-*s/*log
+/home/t-nissie/feram/feram-m.04
+26example-..-06threads/acoustic-MD.lf.log:         12.09        8960.20        8972.29    6     #TIMING_REPORT
+26example-..-06threads/acoustic-MD.vs.log:         12.85        9179.83        9192.69    6     #TIMING_REPORT
+26example-..-12threads/acoustic-MD.lf.log:         12.12        5037.36        5049.48   12     #TIMING_REPORT
+26example-..-12threads/acoustic-MD.vs.log:         13.58        5128.37        5141.94   12     #TIMING_REPORT
+
+Celeron 1037U (1 chip = 2 cores, 1.8GHz, year 2013):
+ silver$ date; pwd; grep TIMING *log
+ Sun Feb 23 06:16:49 JST 2014
+ /home/t-nissie/f/feram/feram-0.22.01/Linux-x86_64-gfortran-4.8.1-silver/src/26example-BaTiO3-acoustic-MD/
+ acoustic-MD.lf.log:                               18.75       18274.28       18293.03    2     #TIMING_REPORT
+ acoustic-MD.vs.log:                               18.77       18833.62       18852.39    2     #TIMING_REPORT
+ silver$ LANG=C date; pwd; grep TIMING *log
+ Mon Aug  4 21:19:53 JST 2014
+ /home/t-nissie/feram/feram-m.04/26example-BaTiO3-acoustic-MD-gfortran-4.8.2-Celeron1037U-2thread-silver
+ acoustic-MD.lf.log:                               16.97       18761.79       18778.76    2     #TIMING_REPORT
+ acoustic-MD.vs.log:                               16.99       18998.80       19015.79    2     #TIMING_REPORT
+
+Xeon E5-2637 v2 (1/2 node = 1 chip = 4 cores, 3.5GHz, year 2014):
+ peridot$ LANG=C date; pwd; grep TIMING *log
+ Fri Feb 28 15:18:33 JST 2014
+ /home/t-nissie/f/feram/feram-0.22.01/Linux-x86_64-gfortran-4.4.7-peridot/src/26example-BaTiO3-acoustic-MD/
+ acoustic-MD.lf.log:                               28.72        4823.38        4852.10    4     #TIMING_REPORT
+ acoustic-MD.vs.log:                               28.76        5030.41        5059.18    4     #TIMING_REPORT
+
+Pentium M (1500MHz, year 2004):
+ /home/takeshi/f/feram/feram-0.22.00/VineLinux-6.2/src/26example-BaTiO3-acoustic-MD/
+ acoustic-MD.lf.log:                               60.49      182236.00      182296.00     #TIMING_REPORT
+ acoustic-MD.vs.log:                               63.07      188881.00      188944.00     #TIMING_REPORT
+
+FX10:
+ See FX10.timing.dat

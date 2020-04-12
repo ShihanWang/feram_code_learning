@@ -1,0 +1,43 @@
+= Calculation of pyroelectric response (Indirect calculation of electrocaloric effect)
+How to perform heating-up and cooling-down simulations under external electric fields.
+
+== On Linux machines with bash
+Edit EXTERNALEc.template and EXTERNALEh.template for your computer.
+For example, add "OMP_NUM_THREADS=4" before "../feram".
+Make sh scripts:
+ $ for ((i=0;i<=425;i+=5)); do s=`printf "%03d" $i`; sed "s/EXTERNALE/$s/" EXTERNALEh.template > "$s"h.csh; done
+ $ for ((i=0;i<=425;i+=5)); do s=`printf "%03d" $i`; sed "s/EXTERNALE/$s/" EXTERNALEc.template > "$s"c.csh; done
+Execute sh scripts one by one:
+ $ csh 000c.csh
+ $ csh 000h.csh
+ $ csh 005c.csh
+ $ csh 005h.csh
+      :
+ $ gnuplot
+ gnuplot> plot '000c.avg' u 1:11, '000c.avg' u 1:12, '000c.avg' u 1:13,\
+               '000h.avg' u 1:11, '000h.avg' u 1:12, '000h.avg' u 1:13
+
+== On SR16000 (super1 in IMR)
+Before submission of jobs, check the path to feram in EXTERNALEc.template and
+EXTERNALEh.template. ./feram or ../feram ? And check the existence of feram.
+
+Make csh scripts, then submit them.
+ $ for ((i=0;i<=425;i+=5)); do s=`printf "%03d" $i`; sed "s/EXTERNALE/$s/" EXTERNALEh.template > "$s"h.csh; submit SC general -pt 8 -exec "$s"h.csh -J "$s"h; done
+ $ for ((i=0;i<=425;i+=5)); do s=`printf "%03d" $i`; sed "s/EXTERNALE/$s/" EXTERNALEc.template > "$s"c.csh; submit SC general -pt 8 -exec "$s"c.csh -J "$s"c; done
+
+Do not set MALLOCMULTIHEAP=true. In this case, this environment variable makes feram slower.
+Note that -pt 8 is faster than -pt 16.
+
+== Plot results with gnuplot and ruby
+After all jobs are completed, execute atable3.gp.
+You will get three EPS files.
+ $ gnuplot atable3.gp
+ $ ls *eps
+ DeltaT.eps  T999.9.eps  atable3.eps
+Because atable.rb, datamaker.sh, integral.rb will
+be called internally, you need Ruby.
+
+== Memo for Takeshi
+First calculations were done in /home/t-nissie/feram/feram-e.07/BaTiO3-020-WuC-0.005-100keVcm/ .
+Scripts  were  also  tested  in /home/t-nissie/feram/feram-j.00/BaTiO3-200-WuC-0.005-EXTERNALE/ .
+Next  calculations were done in /home/t-nissie/feram/feram-j.08/examples-in-SR16000/20example-BaTiO3-new-param-pyro/ .

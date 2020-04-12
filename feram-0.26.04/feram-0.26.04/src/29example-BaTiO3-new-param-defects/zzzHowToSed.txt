@@ -1,0 +1,24 @@
+How to use sed(1):
+     $ sed 's/100/000/g' sixd-100-cooling.sh > sixd-000-cooling.sh
+     $ sed 's/100/000/g' sixd-100-heating.sh > sixd-000-heating.sh
+     $ sed 's/100/000/g' sixd-100-two6threads.csh > sixd-000-two6threads.csh
+     $ chmod 755 sixd-000-*sh   # Do not forget chmod!
+
+     $ for f in sixd*sh; do sed 's/sixd/zero/g' $f > `echo $f | sed 's/sixd/zero/'`; done
+     $ chmod 755 zero*sh
+     $ ls -l zero*sh
+     -rwxr-xr-x 1 t-nissie users 2606 May  6 22:10 zero-000-cooling.sh
+     -rwxr-xr-x 1 t-nissie users 2605 May  6 22:10 zero-000-heating.sh
+     -rwxr-xr-x 1 t-nissie users  207 May  6 22:10 zero-000-two6threads.csh
+     -rwxr-xr-x 1 t-nissie users 2606 May  6 22:10 zero-100-cooling.sh
+     -rwxr-xr-x 1 t-nissie users 2605 May  6 22:10 zero-100-heating.sh
+     -rwxr-xr-x 1 t-nissie users  207 May  6 22:10 zero-100-two6threads.csh
+     $
+
+How to make .defects files:
+     $ SOMEWHERE/feram_defects_maker.rb 16 16 16 'rand 0.2'  84 > rnd2.defects
+     $ SOMEWHERE/feram_defects_maker.rb 16 16 16 'rand 0.2' 126 > rnd3.defects
+     $ SOMEWHERE/feram_defects_maker.rb 16 16 16 'rand 0.2' 168 > rnd4.defects
+
+How to submit jobs on app:
+     $ for r in *.csh; do submit AEB general -exec $r -J `basename $r .csh`; done
